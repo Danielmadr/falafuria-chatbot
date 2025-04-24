@@ -16,30 +16,32 @@ import { ScrollArea } from "./ui/scroll-area";
 import { useState, useEffect, useCallback, useRef } from "react";
 
 export function Chat() {
+  // Estados para gerenciar posição, tamanho e comportamento do chat
   const { messages, input, handleInputChange, handleSubmit } = useChat();
-  const [position, setPosition] = useState({ x: 100, y: 100 });
-  const [size, setSize] = useState({ width: 320, height: 500 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 100, y: 100 }); // Posição inicial do chat
+  const [size, setSize] = useState({ width: 320, height: 500 }); // Tamanho inicial do chat
+  const [isDragging, setIsDragging] = useState(false); // Flag para indicar se o chat está sendo arrastado
+  const [isResizing, setIsResizing] = useState(false); // Flag para indicar se o chat está sendo redimensionado
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 }); // Posição inicial do mouse ao arrastar
   const [resizeStart, setResizeStart] = useState({
     x: 0,
     y: 0,
     width: 0,
     height: 0,
-  });
-  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+  }); // Posição inicial do mouse ao redimensionar
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 }); // Dimensões da janela do navegador
 
+  // Referências para o card e a área de scroll
   const cardRef = useRef(null);
   const scrollAreaRef = useRef(null);
 
-  // Atualizar dimensões da janela no lado do cliente
+  // Atualiza as dimensões da janela no lado do cliente
   useEffect(() => {
     const updateWindowSize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
     };
 
-    updateWindowSize(); // Atualizar ao montar o componente
+    updateWindowSize(); // Atualiza ao montar o componente
     window.addEventListener("resize", updateWindowSize);
 
     return () => {
@@ -47,18 +49,18 @@ export function Chat() {
     };
   }, []);
 
-  // Calculando altura dinâmica para a área de scroll
-  const headerHeight = 100; // Altura aproximada do CardHeader
-  const footerHeight = 70; // Altura aproximada do CardFooter
+  // Calcula a altura dinâmica para a área de scroll
+  const headerHeight = 100; // Altura aproximada do cabeçalho
+  const footerHeight = 70; // Altura aproximada do rodapé
   const scrollAreaHeight = Math.max(
     100,
     size.height - headerHeight - footerHeight
   );
 
-  // Gerenciamento do arrasto
+  // Função para iniciar o arrasto do chat
   const handleMouseDown = useCallback(
     (e) => {
-      if (e.target.classList.contains("resize-handle")) return;
+      if (e.target.classList.contains("resize-handle")) return; // Ignora o evento se for na alça de redimensionamento
 
       setIsDragging(true);
       setDragStart({
@@ -69,9 +71,9 @@ export function Chat() {
     [position]
   );
 
-  // Gerenciamento do redimensionamento
+  // Função para iniciar o redimensionamento do chat
   const handleResizeMouseDown = (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Evita que o evento afete outros elementos
     setIsResizing(true);
     setResizeStart({
       x: e.clientX,
@@ -81,9 +83,10 @@ export function Chat() {
     });
   };
 
-  // Função que gerencia o movimento do mouse
+  // Função que gerencia o movimento do mouse para arrastar ou redimensionar
   const handleMouseMove = (e) => {
     if (isDragging) {
+      // Calcula a nova posição do chat
       const newX = Math.max(
         0,
         Math.min(windowSize.width - size.width, e.clientX - dragStart.x)
@@ -95,6 +98,7 @@ export function Chat() {
 
       setPosition({ x: newX, y: newY });
     } else if (isResizing) {
+      // Calcula o novo tamanho do chat
       const newWidth = Math.max(
         300,
         resizeStart.width + (e.clientX - resizeStart.x)
@@ -113,8 +117,8 @@ export function Chat() {
     setIsDragging(false);
     setIsResizing(false);
   };
-  
-  // Adiciona e remove event listeners
+
+  // Adiciona e remove event listeners para o movimento do mouse
   useEffect(() => {
     if (isDragging || isResizing) {
       document.addEventListener("mousemove", handleMouseMove);
@@ -131,6 +135,7 @@ export function Chat() {
     <div
       className="absolute max-w-full max-h-full"
       style={{
+        // Define a posição e o tamanho do chat dinamicamente
         left: position.x,
         top: position.y,
         width: Math.min(size.width, windowSize.width),
@@ -139,7 +144,7 @@ export function Chat() {
       ref={cardRef}
     >
       <Card className="w-full h-full relative flex flex-col overflow-hidden">
-        {/* Permitir arrastar apenas pelo header */}
+        {/* Cabeçalho do chat - permite arrastar */}
         <CardHeader
           className="select-none pb-2 flex-shrink-0 cursor-grab"
           onMouseDown={handleMouseDown}
@@ -156,7 +161,7 @@ export function Chat() {
           </CardTitle>
         </CardHeader>
 
-        {/* Ajustar o conteúdo para não sobrepor o footer */}
+        {/* Conteúdo do chat - exibe as mensagens */}
         <CardContent
           className="select-none flex-grow p-2 overflow-y-auto"
           style={{ height: `${scrollAreaHeight}px` }}
@@ -169,7 +174,11 @@ export function Chat() {
               return (
                 <div
                   key={message.id}
-                  className="flex space-x-2 text-slate-600 text-sm mb-4"
+                  className={`flex space-x-2 text-sm mb-4 ${
+                    message.role === "user"
+                      ? "text-slate-600"
+                      : "text-slate-700 bg-gray-100 p-2 rounded-md shadow-sm"
+                  }`}
                 >
                   {message.role === "user" ? (
                     <Avatar className="h-8 w-8 flex-shrink-0">
@@ -183,7 +192,7 @@ export function Chat() {
                     </Avatar>
                   )}
                   <p className="leading-relaxed break-words">
-                    <span className="block font-bold text-slate-700">
+                    <span className="block font-bold">
                       {message.role === "user" ? "User" : "FurAi"}
                     </span>
                     {message.content}
@@ -194,6 +203,7 @@ export function Chat() {
           </ScrollArea>
         </CardContent>
 
+        {/* Rodapé do chat - formulário para enviar mensagens */}
         <CardFooter className="select-none mt-auto flex-shrink-0 p-3 bg-card">
           <form className="flex w-full" onSubmit={handleSubmit}>
             <Input
