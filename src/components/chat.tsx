@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { useChat } from "@ai-sdk/react";
 import { ScrollArea } from "./ui/scroll-area";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 export function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
@@ -28,25 +28,46 @@ export function Chat() {
     width: 0,
     height: 0,
   });
-  
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
+
   const cardRef = useRef(null);
   const scrollAreaRef = useRef(null);
 
+  // Atualizar dimensões da janela no lado do cliente
+  useEffect(() => {
+    const updateWindowSize = () => {
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+
+    updateWindowSize(); // Atualizar ao montar o componente
+    window.addEventListener("resize", updateWindowSize);
+
+    return () => {
+      window.removeEventListener("resize", updateWindowSize);
+    };
+  }, []);
+
   // Calculando altura dinâmica para a área de scroll
   const headerHeight = 100; // Altura aproximada do CardHeader
-  const footerHeight = 70;  // Altura aproximada do CardFooter
-  const scrollAreaHeight = Math.max(100, size.height - headerHeight - footerHeight);
+  const footerHeight = 70; // Altura aproximada do CardFooter
+  const scrollAreaHeight = Math.max(
+    100,
+    size.height - headerHeight - footerHeight
+  );
 
   // Gerenciamento do arrasto
-  const handleMouseDown = (e) => {
-    if (e.target.classList.contains("resize-handle")) return;
+  const handleMouseDown = useCallback(
+    (e) => {
+      if (e.target.classList.contains("resize-handle")) return;
 
-    setIsDragging(true);
-    setDragStart({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    });
-  };
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
+      });
+    },
+    [position]
+  );
 
   // Gerenciamento do redimensionamento
   const handleResizeMouseDown = (e) => {
@@ -63,12 +84,17 @@ export function Chat() {
   // Função que gerencia o movimento do mouse
   const handleMouseMove = (e) => {
     if (isDragging) {
-      setPosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
+      const newX = Math.max(
+        0,
+        Math.min(windowSize.width - size.width, e.clientX - dragStart.x)
+      );
+      const newY = Math.max(
+        0,
+        Math.min(windowSize.height - size.height, e.clientY - dragStart.y)
+      );
+
+      setPosition({ x: newX, y: newY });
     } else if (isResizing) {
-      // Calcula novas dimensões com base no movimento do mouse
       const newWidth = Math.max(
         300,
         resizeStart.width + (e.clientX - resizeStart.x)
@@ -78,10 +104,7 @@ export function Chat() {
         resizeStart.height + (e.clientY - resizeStart.y)
       );
 
-      setSize({
-        width: newWidth,
-        height: newHeight,
-      });
+      setSize({ width: newWidth, height: newHeight });
     }
   };
 
@@ -90,17 +113,7 @@ export function Chat() {
     setIsDragging(false);
     setIsResizing(false);
   };
-
-  // Scroll para a última mensagem após redimensionamento ou adição de mensagem
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollContainer) {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
-      }
-    }
-  }, [size.height, messages.length]);
-
+  
   // Adiciona e remove event listeners
   useEffect(() => {
     if (isDragging || isResizing) {
@@ -116,19 +129,22 @@ export function Chat() {
 
   return (
     <div
-      className="absolute"
+      className="absolute max-w-full max-h-full"
       style={{
         left: position.x,
         top: position.y,
-        width: size.width,
-        height: size.height,
-        cursor: isDragging ? "grabbing" : "grab",
+        width: Math.min(size.width, windowSize.width),
+        height: Math.min(size.height, windowSize.height),
       }}
-      onMouseDown={handleMouseDown}
       ref={cardRef}
     >
       <Card className="w-full h-full relative flex flex-col overflow-hidden">
-        <CardHeader className="select-none pb-2 flex-shrink-0">
+        {/* Permitir arrastar apenas pelo header */}
+        <CardHeader
+          className="select-none pb-2 flex-shrink-0 cursor-grab"
+          onMouseDown={handleMouseDown}
+          style={{ cursor: isDragging ? "grabbing" : "grab" }}
+        >
           <CardTitle className="items-center flex justify-center">
             <Image
               src="/logo_black.png"
@@ -138,13 +154,15 @@ export function Chat() {
               className="w-30 h-auto"
             />
           </CardTitle>
-          {/* <CardDescription> alguma coisa</CardDescription> */}
         </CardHeader>
-        
-        <CardContent className="select-none flex-grow p-2 overflow-hidden">
-          <ScrollArea 
-            className="border p-4 shadow-sm rounded-md" 
-            style={{ height: `${scrollAreaHeight}px` }}
+
+        {/* Ajustar o conteúdo para não sobrepor o footer */}
+        <CardContent
+          className="select-none flex-grow p-2 overflow-y-auto"
+          style={{ height: `${scrollAreaHeight}px` }}
+        >
+          <ScrollArea
+            className="border p-4 shadow-sm rounded-md"
             ref={scrollAreaRef}
           >
             {messages.map((message) => {
@@ -175,7 +193,7 @@ export function Chat() {
             })}
           </ScrollArea>
         </CardContent>
-        
+
         <CardFooter className="select-none mt-auto flex-shrink-0 p-3 bg-card">
           <form className="flex w-full" onSubmit={handleSubmit}>
             <Input
@@ -189,11 +207,13 @@ export function Chat() {
             </Button>
           </form>
         </CardFooter>
-        
+
         {/* Alça de redimensionamento */}
         <div
           className="resize-handle absolute bottom-0 right-0 w-6 h-6 bg-gray-300 opacity-70 rounded-bl cursor-se-resize flex items-center justify-center"
           onMouseDown={handleResizeMouseDown}
+          aria-label="Redimensionar"
+          role="button"
         >
           <svg width="10" height="10" viewBox="0 0 10 10">
             <path
