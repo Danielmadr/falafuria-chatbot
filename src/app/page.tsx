@@ -1,8 +1,8 @@
-import { Chat } from "@/components/chat";
+import Chat from "@/components/Chat/Chat";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 bg-[url('/background.png')] bg-cover bg-center">
       <Chat />
     </div>
   );
