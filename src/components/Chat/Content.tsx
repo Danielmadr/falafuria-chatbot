@@ -36,8 +36,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
 
   return (
     <CardContent
-      className="flex flex-col flex-grow p-2 mt-2"
-      style={{ height: `${scrollAreaHeight}px` }}
+      className="flex flex-col p-2 mt-2 h-150"
     >
       <FrequentQuestions
         onSelectQuestion={onSelectQuestion} 

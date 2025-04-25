@@ -7,9 +7,17 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   const { messages } = await req.json();
 
+    // Adiciona o prompt de sistema no início
+    const systemPrompt = {
+      role: "system",
+      content:
+        "Você é um assistente virtual descolado, jovem e antenado, especialista no time de CS:GO da FURIA. Responda às perguntas de forma clara, objetiva e com um toque descontraído, como se estivesse conversando com um amigo. Use linguagem informal, emojis quando fizer sentido e sempre traga informações atualizadas até abril de 2025.",
+    };
+
+
   const result = streamText({
     model: openai("gpt-4.1-nano"),
-    messages,
+    messages: [systemPrompt, ...messages],
   });
 
   return result.toDataStreamResponse({
