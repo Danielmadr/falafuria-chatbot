@@ -50,6 +50,7 @@ const Chat: React.FC = () => {
   const [position, setPosition] = useState<Position>({ x: 300, y: 100 });
   const [size, setSize] = useState<Size>({ width: 500, height: 600 });
   const [windowSize, setWindowSize] = useState<WindowSize>({ width: 0, height: 0 });
+  const [faqsOpen, setFaqsOpen] = useState<boolean>(false);
   
   // References
   const cardRef = useRef<HTMLDivElement>(null);
@@ -93,6 +94,11 @@ const Chat: React.FC = () => {
     };
   }, []);
 
+  // Handle FAQ section state change
+  const handleFAQsOpenChange = (isOpen: boolean) => {
+    setFaqsOpen(isOpen);
+  };
+
   // Setup drag and resize hooks
   const { isDragging, handleDragStart } = useDrag({
     position,
@@ -121,15 +127,18 @@ const Chat: React.FC = () => {
       role="dialog"
       aria-label="Chat interface"
     >
-      <Card className="w-full h-full relative flex-grow flex-col overflow-hidden shadow-lg pt-0 gap-0">
+      <Card className="w-full h-full relative flex flex-col overflow-hidden shadow-lg pt-0 gap-0">
         <Header onMouseDown={handleDragStart} isDragging={isDragging} />
-        <Content
-          messages={messages}
-          size={size}
-          headerHeight={HEADER_HEIGHT}
-          footerHeight={FOOTER_HEIGHT}
-          onSelectQuestion={handleSelectQuestion}
-        />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <Content
+            messages={messages}
+            size={size}
+            headerHeight={HEADER_HEIGHT}
+            footerHeight={FOOTER_HEIGHT}
+            onSelectQuestion={handleSelectQuestion}
+            onFAQsOpenChange={handleFAQsOpenChange}
+          />
+        </div>
         <Footer
           input={input}
           handleInputChange={handleInputChange}
@@ -137,7 +146,7 @@ const Chat: React.FC = () => {
           isLoading={isLoading}
           ref={formRef}
         />
-        <ResizeHandle onMouseDown={handleResizeStart} isResizing={isResizing} />
+        <ResizeHandle onMouseDown={handleResizeStart} isResizing={isResizing} faqsOpen={faqsOpen} />
       </Card>
     </div>
   );

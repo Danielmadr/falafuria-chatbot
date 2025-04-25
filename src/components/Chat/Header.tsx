@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { CardHeader, CardTitle } from "@/components/ui/card";
+import { GripHorizontal } from "lucide-react";
 
 interface ChatHeaderProps {
   onMouseDown: (e: React.MouseEvent) => void;
@@ -10,25 +11,27 @@ interface ChatHeaderProps {
 const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
   return (
     <CardHeader
-      className={`${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+      className={`p-4 flex flex-row items-center bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-b ${
+        isDragging ? "cursor-grabbing" : "cursor-grab"
+      }`}
       onMouseDown={onMouseDown}
       role="button"
       aria-label="Drag to move chat window"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          // Simulate a mouse down event for keyboard accessibility
           onMouseDown(e as unknown as React.MouseEvent);
         }
       }}
     >
-      <CardTitle className="items-center flex justify-center">
+      <GripHorizontal className="h-5 w-5 text-gray-500 mr-2" />
+      <CardTitle className="flex items-center justify-center">
         <Image
           src="/logo_black.png"
           alt="FurAi Chat Logo"
           width={80}
           height={70}
-          className="w-30 h-auto"
+          className="w-24 h-auto"
           priority
         />
       </CardTitle>

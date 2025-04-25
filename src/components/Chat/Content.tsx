@@ -14,6 +14,7 @@ import FrequentQuestions from "./FrequentQuestions";
  * @param {number} headerHeight - Height of the header section
  * @param {number} footerHeight - Height of the footer section
  * @param {Function} onSelectQuestion - Callback for when a FAQ is selected
+ * @param {Function} onFAQsOpenChange - Callback for when FAQs section opens/closes
  */
 interface ChatContentProps {
   messages: Message[];
@@ -21,24 +22,17 @@ interface ChatContentProps {
   headerHeight: number;
   footerHeight: number;
   onSelectQuestion?: (question: string) => void;
+  onFAQsOpenChange?: (isOpen: boolean) => void;
 }
 
 const ChatContent: React.FC<ChatContentProps> = ({
   messages,
-  size,
-  headerHeight,
-  footerHeight,
   onSelectQuestion = () => {},
+  onFAQsOpenChange = () => {},
 }) => {
   // State to track whether chat or FAQ should be displayed
   const [showChat, setShowChat] = useState<boolean>(true);
   
-  // Calculate available height for content area
-  const scrollAreaHeight = Math.max(
-    100,
-    size.height - headerHeight - footerHeight
-  );
-
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -58,55 +52,63 @@ const ChatContent: React.FC<ChatContentProps> = ({
   const handleFAQToggle = (isOpen: boolean) => {
     // When FAQ is expanded, hide chat
     setShowChat(!isOpen);
+    onFAQsOpenChange(isOpen);
   };
 
   return (
-    <CardContent
-      className="flex flex-col p-2 mt-2 h-150"
-    >
-      <FrequentQuestions
-        onSelectQuestion={handleQuestionSelect}
-        onOpenChange={handleFAQToggle}
-      />
+    <CardContent className="p-2 flex-1 flex flex-col overflow-hidden">
+      <div className="mb-2">
+        <FrequentQuestions
+          onSelectQuestion={handleQuestionSelect}
+          onOpenChange={handleFAQToggle}
+        />
+      </div>
       
       {showChat && (
-        <ScrollArea className="flex h-full border rounded-md p-4 shadow-sm"
-          style={{ height: scrollAreaHeight }}>
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex space-x-2 text-sm mb-4 ${
-                message.role === "user"
-                  ? "text-slate-600"
-                  : "text-slate-700 bg-gray-100 p-2 rounded-md shadow-sm"
-              }`}
-            >
-              {message.role === "user" ? (
-                <Avatar className="h-8 w-8 flex-shrink-0">
-                  <AvatarImage src="" alt="User avatar" />
-                  <AvatarFallback>User</AvatarFallback>
-                </Avatar>
-              ) : (
-                <Avatar className="h-8 w-8 flex-shrink-0">
-                  <AvatarImage
-                    src="/iavatar_black.png"
-                    alt="AI assistant avatar"
-                  />
-                  <AvatarFallback>AI</AvatarFallback>
-                </Avatar>
-              )}
-              <div className="flex-1">
-                <p className="font-bold mb-1">
-                  {message.role === "user" ? "User" : "FurAi"}
-                </p>
-                <div className="leading-relaxed break-words whitespace-pre-wrap">
-                  {message.content}
-                </div>
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full border rounded-md p-4 shadow-sm bg-white dark:bg-gray-800">
+            {messages.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-gray-400 text-center p-4">
+                <p>Selecione uma pergunta frequente ou envie uma mensagem para começar a conversa.</p>
               </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </ScrollArea>
+            ) : (
+              messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex space-x-2 text-sm mb-4 ${
+                    message.role === "user"
+                      ? "text-slate-600"
+                      : "text-slate-700 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg shadow-sm"
+                  }`}
+                >
+                  {message.role === "user" ? (
+                    <Avatar className="h-8 w-8 flex-shrink-0">
+                      <AvatarImage src="" alt="User avatar" />
+                      <AvatarFallback className="bg-blue-500 text-white">User</AvatarFallback>
+                    </Avatar>
+                  ) : (
+                    <Avatar className="h-8 w-8 flex-shrink-0">
+                      <AvatarImage
+                        src="/iavatar_black.png"
+                        alt="AI assistant avatar"
+                      />
+                      <AvatarFallback className="bg-red-500 text-white">AI</AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div className="flex-1">
+                    <p className="font-bold mb-1">
+                      {message.role === "user" ? "User" : "FurAi"}
+                    </p>
+                    <div className="leading-relaxed break-words whitespace-pre-wrap">
+                      {message.content}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+            <div ref={messagesEndRef} />
+          </ScrollArea>
+        </div>
       )}
     </CardContent>
   );
