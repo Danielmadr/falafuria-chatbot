@@ -102,9 +102,10 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
         </div>
         {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </CollapsibleTrigger>
-      <CollapsibleContent className="w-full">
+      <CollapsibleContent className="w-full overflow-hidden">
         <div className="rounded-lg border p-4 shadow-sm bg-white dark:bg-gray-800 mb-4">
-          <ScrollArea className="max-h-80 pr-2">
+          {/* Increased height for better visibility and scrolling */}
+          <ScrollArea className="h-64 pr-2 overflow-y-auto">
             <div className="space-y-6">
               {questionCategories.map((category, catIndex) => (
                 <div key={catIndex} className="space-y-2">
