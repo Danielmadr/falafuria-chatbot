@@ -11,7 +11,7 @@ interface ChatHeaderProps {
 const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
   return (
     <CardHeader
-      className={`p-4 flex flex-row items-center bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-b ${
+      className={`pt-4 pb-0 flex flex-row items-center bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-b ${
         isDragging ? "cursor-grabbing" : "cursor-grab"
       }`}
       onMouseDown={onMouseDown}
@@ -25,14 +25,16 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
       }}
     >
       <GripHorizontal className="h-5 w-5 text-gray-500 mr-2" />
-      <CardTitle className="flex items-center justify-center">
+      <CardTitle className="flex items-center justify-center w-full">
         <Image
           src="/logo_black.png"
           alt="FurAi Chat Logo"
           width={80}
           height={70}
-          className="w-24 h-auto"
+          className="w-24 h-auto pointer-events-none"
           priority
+          draggable="false"
+          onDragStart={(e) => e.preventDefault()}
         />
       </CardTitle>
     </CardHeader>
