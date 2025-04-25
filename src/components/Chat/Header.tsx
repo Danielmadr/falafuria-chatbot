@@ -10,7 +10,7 @@ interface ChatHeaderProps {
 const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
   return (
     <CardHeader
-      className={`pb-2 flex-shrink-0 ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
+      className={`${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
       onMouseDown={onMouseDown}
       role="button"
       aria-label="Drag to move chat window"
