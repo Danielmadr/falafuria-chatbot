@@ -104,8 +104,8 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
       </CollapsibleTrigger>
       <CollapsibleContent className="w-full overflow-hidden">
         <div className="rounded-lg border p-4 shadow-sm bg-white dark:bg-gray-800 mb-4">
-          {/* Increased height for better visibility and scrolling */}
-          <ScrollArea className="h-64 pr-2 overflow-y-auto">
+          {/* Altura responsiva com min/max para garantir usabilidade */}
+          <ScrollArea className="max-h-48 min-h-48 pr-2 overflow-y-auto">
             <div className="space-y-6">
               {questionCategories.map((category, catIndex) => (
                 <div key={catIndex} className="space-y-2">
@@ -118,10 +118,10 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
                         key={qIndex}
                         variant="ghost"
                         size="sm"
-                        className="justify-start text-left h-auto w-full py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                        className="justify-start text-left h-auto w-full py-2 px-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 whitespace-normal break-words"
                         onClick={() => handleQuestionClick(question)}
                       >
-                        {question}
+                        <span className="text-left">{question}</span>
                       </Button>
                     ))}
                   </div>
