@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -7,13 +7,38 @@ import {
 } from "../ui/collapsible";
 import { ScrollArea } from "../ui/scroll-area";
 
+/**
+ * FrequentQuestions component displays a collapsible list of predefined questions
+ * that users can select to quickly interact with the chat.
+ * 
+ * @param {Function} onSelectQuestion - Callback when a question is selected
+ * @param {Function} onOpenChange - Callback when the collapsible state changes
+ */
 interface FrequentQuestionsProps {
   onSelectQuestion: (question: string) => void;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   onSelectQuestion,
+  onOpenChange = () => {},
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  // Handle open state change
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    onOpenChange(open);
+  };
+
+  // Handle question selection
+  const handleQuestionClick = (question: string) => {
+    onSelectQuestion(question);
+    // Auto-close the FAQ section after selection
+    setIsOpen(false);
+    onOpenChange(false);
+  };
+
   // Lista de perguntas frequentes
   const questions = [
     "Qual é a escalação atual da FURIA?",
@@ -44,19 +69,23 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   ];
 
   return (
-    <Collapsible className="flex flex-col">
+    <Collapsible 
+      className="flex flex-col" 
+      open={isOpen} 
+      onOpenChange={handleOpenChange}
+    >
       <CollapsibleTrigger className="h-full w-full not-first:border rounded-md p-4 shadow-sm mb-2">
-        Perguntas Frequentes
+        {isOpen ? "Fechar Perguntas Frequentes" : "Perguntas Frequentes"}
       </CollapsibleTrigger>
       <CollapsibleContent className="flex">
-        <ScrollArea className="flex space-y-2 mb-2">
+        <ScrollArea className="flex space-y-2 mb-2 max-h-80 w-full">
           {questions.map((question, index) => (
             <Button
               key={index}
               variant="outline"
               size="sm"
               className="justify-start text-left h-auto w-full py-2 text-gray-700 hover:bg-gray-100 mb-1"
-              onClick={() => onSelectQuestion(question)}
+              onClick={() => handleQuestionClick(question)}
             >
               {question}
             </Button>

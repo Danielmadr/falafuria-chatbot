@@ -10,42 +10,63 @@ import { Card } from "@/components/ui/card";
 import { useDrag } from "../hooks/useDrag";
 import { useResize } from "../hooks/useResize";
 
+/**
+ * Position interface represents the x and y coordinates of the chat window
+ */
 interface Position {
   x: number;
   y: number;
 }
 
+/**
+ * Size interface represents the width and height of the chat window
+ */
 interface Size {
   width: number;
   height: number;
 }
 
+/**
+ * WindowSize interface represents the width and height of the browser window
+ */
 interface WindowSize {
   width: number;
   height: number;
 }
 
+/**
+ * Chat component is the main container for the chat interface.
+ * It manages:
+ * - Chat window position and size
+ * - Drag and resize functionality
+ * - Chat messages and input
+ * - FAQ selection
+ */
 const Chat: React.FC = () => {
-  // Chat state
+  // Chat state using AI SDK
   const { messages, input, handleInputChange, handleSubmit, isLoading, setInput } = useChat();
   
-  
-  // Window state
+  // Window state and positioning
   const [position, setPosition] = useState<Position>({ x: 300, y: 100 });
   const [size, setSize] = useState<Size>({ width: 500, height: 600 });
   const [windowSize, setWindowSize] = useState<WindowSize>({ width: 0, height: 0 });
   
-  // Refs
+  // References
   const cardRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   
-  // Constants
+  // Constants for sizing constraints
   const MIN_WIDTH = 300;
   const MIN_HEIGHT = 350;
   const HEADER_HEIGHT = 100;
   const FOOTER_HEIGHT = 70;
 
-  // Handle FAQ selection
+  /**
+   * Handles the selection of a predefined question
+   * Sets the input value and submits the form programmatically
+   * 
+   * @param {string} question - The selected question text
+   */
   const handleSelectQuestion = (question: string) => {
     setInput(question);
     
@@ -58,7 +79,7 @@ const Chat: React.FC = () => {
     }, 100);
   };
   
-  // Window size event handler
+  // Update window size when browser window is resized
   useEffect(() => {
     const updateWindowSize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
@@ -108,13 +129,13 @@ const Chat: React.FC = () => {
           headerHeight={HEADER_HEIGHT}
           footerHeight={FOOTER_HEIGHT}
           onSelectQuestion={handleSelectQuestion}
-          
         />
         <Footer
           input={input}
           handleInputChange={handleInputChange}
           handleSubmit={handleSubmit}
           isLoading={isLoading}
+          ref={formRef}
         />
         <ResizeHandle onMouseDown={handleResizeStart} isResizing={isResizing} />
       </Card>
