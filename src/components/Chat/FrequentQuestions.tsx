@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -9,26 +9,71 @@ import { ScrollArea } from "../ui/scroll-area";
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
 
 /**
+ * QuestionCategory represents a group of related questions
+ */
+interface QuestionCategory {
+  title: string;
+  questions: string[];
+}
+
+/**
  * FrequentQuestions component displays a collapsible list of predefined questions
  * that users can select to quickly interact with the chat.
  * 
  * @param {Function} onSelectQuestion - Callback when a question is selected
  * @param {Function} onOpenChange - Callback when the collapsible state changes
+ * @param {boolean} isOpen - Whether the FAQ section is open (controlled from parent)
  */
 interface FrequentQuestionsProps {
   onSelectQuestion: (question: string) => void;
-  onOpenChange?: (isOpen: boolean) => void;
+  onOpenChange: (isOpen: boolean) => void;
+  isOpen?: boolean;
 }
+
+/**
+ * Single category component for better organization and performance
+ */
+const QuestionCategorySection: React.FC<{
+  category: QuestionCategory;
+  onSelectQuestion: (question: string) => void;
+}> = ({ category, onSelectQuestion }) => {
+  return (
+    <div className="space-y-2">
+      <h3 className="font-medium text-sm text-blue-600 dark:text-blue-400 mb-2 border-b pb-1">
+        {category.title}
+      </h3>
+      <div className="space-y-1">
+        {category.questions.map((question, qIndex) => (
+          <Button
+            key={qIndex}
+            variant="ghost"
+            size="sm"
+            className="justify-start text-left h-auto w-full py-2 px-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 whitespace-normal break-words"
+            onClick={() => onSelectQuestion(question)}
+          >
+            <span className="text-left">{question}</span>
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   onSelectQuestion,
-  onOpenChange = () => {},
+  onOpenChange,
+  isOpen = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = React.useState(isOpen);
+  
+  // Sync with parent component's state
+  useEffect(() => {
+    setInternalOpen(isOpen);
+  }, [isOpen]);
   
   // Handle open state change
   const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
+    setInternalOpen(open);
     onOpenChange(open);
   };
 
@@ -36,12 +81,12 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   const handleQuestionClick = (question: string) => {
     onSelectQuestion(question);
     // Auto-close the FAQ section after selection
-    setIsOpen(false);
+    setInternalOpen(false);
     onOpenChange(false);
   };
 
   // List of frequent questions - categorized for better organization
-  const questionCategories = [
+  const questionCategories: QuestionCategory[] = [
     {
       title: "Sobre o Time",
       questions: [
@@ -92,15 +137,18 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   return (
     <Collapsible 
       className="flex flex-col w-full" 
-      open={isOpen} 
+      open={internalOpen} 
       onOpenChange={handleOpenChange}
     >
-      <CollapsibleTrigger className="w-full not-first:border rounded-lg p-3 shadow-sm mb-2 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-between hover:shadow-md transition-shadow">
+      <CollapsibleTrigger 
+        className="w-full rounded-lg p-3 shadow-sm mb-2 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-between hover:shadow-md transition-shadow"
+        aria-label={internalOpen ? "Fechar perguntas frequentes" : "Abrir perguntas frequentes"}
+      >
         <div className="flex items-center gap-2">
           <HelpCircle size={18} className="text-blue-500" />
           <span className="font-medium">Perguntas Frequentes</span>
         </div>
-        {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        {internalOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </CollapsibleTrigger>
       <CollapsibleContent className="w-full overflow-hidden">
         <div className="rounded-lg border p-4 shadow-sm bg-white dark:bg-gray-800 mb-4">
@@ -108,24 +156,11 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
           <ScrollArea className="max-h-48 min-h-48 pr-2 overflow-y-auto">
             <div className="space-y-6">
               {questionCategories.map((category, catIndex) => (
-                <div key={catIndex} className="space-y-2">
-                  <h3 className="font-medium text-sm text-blue-600 dark:text-blue-400 mb-2 border-b pb-1">
-                    {category.title}
-                  </h3>
-                  <div className="space-y-1">
-                    {category.questions.map((question, qIndex) => (
-                      <Button
-                        key={qIndex}
-                        variant="ghost"
-                        size="sm"
-                        className="justify-start text-left h-auto w-full py-2 px-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 whitespace-normal break-words"
-                        onClick={() => handleQuestionClick(question)}
-                      >
-                        <span className="text-left">{question}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
+                <QuestionCategorySection
+                  key={catIndex}
+                  category={category}
+                  onSelectQuestion={handleQuestionClick}
+                />
               ))}
             </div>
           </ScrollArea>
@@ -135,4 +170,4 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   );
 };
 
-export default FrequentQuestions;
+export default React.memo(FrequentQuestions);

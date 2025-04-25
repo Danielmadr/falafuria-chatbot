@@ -40,14 +40,14 @@ interface WindowSize {
  * - Chat window position and size
  * - Drag and resize functionality
  * - Chat messages and input
- * - FAQ selection
+ * - FAQ selection and visibility
  */
 const Chat: React.FC = () => {
   // Chat state using AI SDK
   const { messages, input, handleInputChange, handleSubmit, isLoading, setInput } = useChat();
   
   // Window state and positioning
-  const [position, setPosition] = useState<Position>({ x: 300, y: 100 });
+  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
   const [size, setSize] = useState<Size>({ width: 500, height: 600 });
   const [windowSize, setWindowSize] = useState<WindowSize>({ width: 0, height: 0 });
   const [faqsOpen, setFaqsOpen] = useState<boolean>(false);
@@ -61,6 +61,23 @@ const Chat: React.FC = () => {
   const MIN_HEIGHT = 350;
   const HEADER_HEIGHT = 100;
   const FOOTER_HEIGHT = 70;
+  const DEFAULT_WIDTH_PERCENTAGE = 0.4; // 40% of screen width
+  const DEFAULT_HEIGHT_PERCENTAGE = 0.7; // 70% of screen height
+
+  /**
+   * Calculate initial position and size based on window dimensions
+   * @returns {Object} Object containing position and size values
+   */
+  const calculateInitialPositionAndSize = () => {
+    const width = Math.max(MIN_WIDTH, Math.floor(window.innerWidth * DEFAULT_WIDTH_PERCENTAGE));
+    const height = Math.max(MIN_HEIGHT, Math.floor(window.innerHeight * DEFAULT_HEIGHT_PERCENTAGE));
+    
+    // Center the chat window
+    const x = Math.floor((window.innerWidth - width) / 5); // Position slightly to the left of center
+    const y = Math.floor((window.innerHeight - height) / 4); // Position slightly above center
+    
+    return { position: { x, y }, size: { width, height } };
+  };
 
   /**
    * Handles the selection of a predefined question
@@ -71,47 +88,86 @@ const Chat: React.FC = () => {
   const handleSelectQuestion = (question: string) => {
     setInput(question);
     
-    // Submit the form programmatically
+    // Submit the form programmatically after state update
     setTimeout(() => {
       if (formRef.current) {
         const event = new Event('submit', { bubbles: true, cancelable: true });
         formRef.current.dispatchEvent(event);
       }
     }, 100);
+    
+    // Ensure FAQs are closed when a question is selected
+    setFaqsOpen(false);
   };
   
-  // Update window size when browser window is resized
-  useEffect(() => {
-    const updateWindowSize = () => {
-      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
-    };
+  /**
+   * Updates window dimensions and ensures the chat window stays within bounds
+   */
+  const updateWindowDimensions = () => {
+    const newWindowSize = { width: window.innerWidth, height: window.innerHeight };
+    setWindowSize(newWindowSize);
 
-    updateWindowSize();
-    window.addEventListener("resize", updateWindowSize);
+    // Ensure chat dimensions don't exceed window size
+    setSize(prevSize => ({
+      width: Math.min(prevSize.width, newWindowSize.width),
+      height: Math.min(prevSize.height, newWindowSize.height)
+    }));
+
+    // Ensure chat position stays within window boundaries
+    setPosition(prevPosition => ({
+      x: Math.min(prevPosition.x, Math.max(0, newWindowSize.width - size.width)),
+      y: Math.min(prevPosition.y, Math.max(0, newWindowSize.height - size.height))
+    }));
+  };
+
+  // Initialize window size and chat position/size
+  useEffect(() => {
+    // Initial setup
+    if (windowSize.width === 0 && windowSize.height === 0) {
+      const initialValues = calculateInitialPositionAndSize();
+      setPosition(initialValues.position);
+      setSize(initialValues.size);
+      setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    }
+
+    updateWindowDimensions();
+    
+    // Add resize listener
+    window.addEventListener("resize", updateWindowDimensions);
 
     return () => {
-      window.removeEventListener("resize", updateWindowSize);
+      window.removeEventListener("resize", updateWindowDimensions);
     };
-  }, []);
+  }, [windowSize.width, windowSize.height, size.width, size.height]);
 
   // Handle FAQ section state change
   const handleFAQsOpenChange = (isOpen: boolean) => {
     setFaqsOpen(isOpen);
   };
 
-  // Setup drag and resize hooks
+  // Setup drag and resize hooks with boundary constraints
   const { isDragging, handleDragStart } = useDrag({
     position,
     setPosition,
     windowSize,
-    size
+    size,
+    // Add constraints to prevent dragging outside screen
+    constraints: {
+      minX: 0,
+      minY: 0,
+      maxX: Math.max(0, windowSize.width - size.width),
+      maxY: Math.max(0, windowSize.height - size.height)
+    }
   });
   
   const { isResizing, handleResizeStart } = useResize({
     size,
     setSize,
     minWidth: MIN_WIDTH,
-    minHeight: MIN_HEIGHT
+    minHeight: MIN_HEIGHT,
+    // Add constraints to prevent resizing beyond screen
+    maxWidth: windowSize.width - position.x,
+    maxHeight: windowSize.height - position.y
   });
 
   return (
@@ -120,8 +176,8 @@ const Chat: React.FC = () => {
       style={{
         left: position.x,
         top: position.y,
-        width: Math.min(size.width, windowSize.width),
-        height: Math.min(size.height, windowSize.height),
+        width: size.width,
+        height: size.height,
       }}
       ref={cardRef}
       role="dialog"
@@ -137,6 +193,7 @@ const Chat: React.FC = () => {
             footerHeight={FOOTER_HEIGHT}
             onSelectQuestion={handleSelectQuestion}
             onFAQsOpenChange={handleFAQsOpenChange}
+            faqsOpen={faqsOpen}
           />
         </div>
         <Footer
