@@ -13,8 +13,8 @@ const ChatMessage = memo(({ message }: ChatMessageProps) => {
     <div
       className={`flex space-x-2 text-sm mb-4 ${
         isUser
-          ? "text-slate-600"
-          : "text-slate-700 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg shadow-sm"
+          ? "text-slate-600 dark:text-slate-300"
+          : "text-slate-700 dark:text-slate-200 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg shadow-sm"
       }`}
     >
       <Avatar className="h-12 w-12 flex-shrink-0 p-1">
@@ -27,7 +27,7 @@ const ChatMessage = memo(({ message }: ChatMessageProps) => {
         </AvatarFallback>
       </Avatar>
       <div className="flex-1">
-        <p className="font-bold mb-1">
+        <p className="font-bold mb-1 dark:text-white">
           {isUser ? "User" : "FurAi"}
         </p>
         <div className="leading-relaxed break-words whitespace-pre-wrap">
