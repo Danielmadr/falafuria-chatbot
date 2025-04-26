@@ -10,7 +10,7 @@ import { useChat } from "../contexts/ChatContext";
 /**
  * ChatContent component manages the main content area of the chat interface
  * including message display and FAQ section.
- * 
+ *
  * @param {Message[]} messages - Array of chat messages to display
  * @param {Size} size - Width and height of the chat container
  * @param {number} headerHeight - Height of the header section
@@ -34,7 +34,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
 }) => {
   // Get selectQuestion function from context
   const { selectQuestion } = useChat();
-  
+
   // Single source of truth - use parent's faqsOpen state to determine visibility
   const showChat = !faqsOpen;
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -65,14 +65,17 @@ const ChatContent: React.FC<ChatContentProps> = ({
           isOpen={faqsOpen}
         />
       </div>
-      
+
       {showChat && (
         <div className="flex-1 overflow-hidden">
           <ScrollArea className="h-full border rounded-md p-4 shadow-sm bg-white dark:bg-gray-800">
             {messages.length === 0 ? (
               <div className="flex items-center justify-center h-full text-gray-400 text-center p-4">
-                <p>Selecione uma pergunta frequente ou envie uma mensagem para começar a conversa.</p>
-              </div>  
+                <p>
+                  Selecione uma pergunta frequente ou envie uma mensagem para
+                  começar a conversa.
+                </p>
+              </div>
             ) : (
               <>
                 {messages.map((message) => (

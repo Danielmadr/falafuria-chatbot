@@ -10,7 +10,11 @@ import { useDrag } from "../hooks/useDrag";
 import { useResize } from "../hooks/useResize";
 import { useWindowSize } from "../contexts/WindowSizeContext";
 import { useChat } from "../contexts/ChatContext";
-import { calculateInitialPositionAndSize, constrainPositionToViewport, constrainSize } from "../utils/layoutUtils";
+import {
+  calculateInitialPositionAndSize,
+  constrainPositionToViewport,
+  constrainSize,
+} from "../utils/layoutUtils";
 
 /**
  * Chat component is the main container for the chat interface.
@@ -22,27 +26,27 @@ import { calculateInitialPositionAndSize, constrainPositionToViewport, constrain
  */
 const Chat: React.FC = () => {
   // Get chat state from context
-  const { 
-    messages, 
-    input, 
-    handleInputChange, 
-    handleSubmit, 
-    isLoading, 
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
     formRef,
     position,
     setPosition,
     size,
     setSize,
     faqsOpen,
-    setFaqsOpen
+    setFaqsOpen,
   } = useChat();
-  
+
   // Get window dimensions from context
   const { windowSize } = useWindowSize();
-  
+
   // References
   const cardRef = useRef<HTMLDivElement>(null);
-  
+
   // Constants for sizing constraints
   const MIN_WIDTH = 300;
   const MIN_HEIGHT = 350;
@@ -55,22 +59,23 @@ const Chat: React.FC = () => {
   useEffect(() => {
     // Skip if window dimensions aren't available yet
     if (windowSize.width <= 0 || windowSize.height <= 0) return;
-    
+
     // Set initial position/size if not already set
     if (position.x === 0 && position.y === 0) {
-      const { position: initialPosition, size: initialSize } = calculateInitialPositionAndSize(
-        windowSize.width,
-        windowSize.height,
-        MIN_WIDTH,
-        MIN_HEIGHT,
-        DEFAULT_WIDTH_PERCENTAGE,
-        DEFAULT_HEIGHT_PERCENTAGE
-      );
+      const { position: initialPosition, size: initialSize } =
+        calculateInitialPositionAndSize(
+          windowSize.width,
+          windowSize.height,
+          MIN_WIDTH,
+          MIN_HEIGHT,
+          DEFAULT_WIDTH_PERCENTAGE,
+          DEFAULT_HEIGHT_PERCENTAGE
+        );
       setPosition(initialPosition);
       setSize(initialSize);
       return;
     }
-    
+
     // Ensure chat window stays within viewport when window is resized
     const constrainedSize = constrainSize(
       size,
@@ -79,19 +84,25 @@ const Chat: React.FC = () => {
       windowSize.width,
       windowSize.height
     );
-    
-    if (constrainedSize.width !== size.width || constrainedSize.height !== size.height) {
+
+    if (
+      constrainedSize.width !== size.width ||
+      constrainedSize.height !== size.height
+    ) {
       setSize(constrainedSize);
     }
-    
+
     const constrainedPosition = constrainPositionToViewport(
       position,
       constrainedSize,
       windowSize.width,
       windowSize.height
     );
-    
-    if (constrainedPosition.x !== position.x || constrainedPosition.y !== position.y) {
+
+    if (
+      constrainedPosition.x !== position.x ||
+      constrainedPosition.y !== position.y
+    ) {
       setPosition(constrainedPosition);
     }
   }, [windowSize, position, size, setPosition, setSize]);
@@ -101,7 +112,7 @@ const Chat: React.FC = () => {
     minX: 0,
     minY: 0,
     maxX: Math.max(0, windowSize.width - size.width),
-    maxY: Math.max(0, windowSize.height - size.height)
+    maxY: Math.max(0, windowSize.height - size.height),
   };
 
   // Setup drag and resize hooks with boundary constraints
@@ -110,16 +121,16 @@ const Chat: React.FC = () => {
     setPosition,
     windowSize,
     size,
-    constraints: dragConstraints
+    constraints: dragConstraints,
   });
-  
+
   const { isResizing, handleResizeStart } = useResize({
     size,
     setSize,
     minWidth: MIN_WIDTH,
     minHeight: MIN_HEIGHT,
     maxWidth: windowSize.width - position.x,
-    maxHeight: windowSize.height - position.y
+    maxHeight: windowSize.height - position.y,
   });
 
   return (
@@ -154,7 +165,11 @@ const Chat: React.FC = () => {
           isLoading={isLoading}
           ref={formRef}
         />
-        <ResizeHandle onMouseDown={handleResizeStart} isResizing={isResizing} faqsOpen={faqsOpen} />
+        <ResizeHandle
+          onMouseDown={handleResizeStart}
+          isResizing={isResizing}
+          faqsOpen={faqsOpen}
+        />
       </Card>
     </div>
   );
