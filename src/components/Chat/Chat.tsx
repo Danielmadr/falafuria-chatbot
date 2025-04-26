@@ -146,7 +146,7 @@ const Chat: React.FC = () => {
       role="dialog"
       aria-label="Chat interface"
     >
-      <Card className="w-full h-full relative flex flex-col overflow-hidden shadow-lg pt-0 gap-0">
+      <Card className="w-full h-full relative flex flex-col overflow-hidden shadow-lg p-0 gap-0">
         <Header onMouseDown={handleDragStart} isDragging={isDragging} />
         <div className="flex-1 flex flex-col overflow-hidden">
           <Content

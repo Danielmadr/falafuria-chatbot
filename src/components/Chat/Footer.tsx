@@ -27,7 +27,7 @@ const ChatFooter = forwardRef<HTMLFormElement, ChatFooterProps>(({
   isLoading = false,
 }, ref) => {
   return (
-    <CardFooter className="p-3 bg-white dark:bg-gray-800 border-t">
+    <CardFooter className="p-3 pb-7 bg-white dark:bg-gray-800 border-t">
       <form className="flex w-full items-center" onSubmit={handleSubmit} ref={ref}>
         <Input
           placeholder="Digite sua mensagem"
