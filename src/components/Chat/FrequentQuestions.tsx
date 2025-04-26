@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, memo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -19,10 +19,6 @@ interface QuestionCategory {
 /**
  * FrequentQuestions component displays a collapsible list of predefined questions
  * that users can select to quickly interact with the chat.
- * 
- * @param {Function} onSelectQuestion - Callback when a question is selected
- * @param {Function} onOpenChange - Callback when the collapsible state changes
- * @param {boolean} isOpen - Whether the FAQ section is open (controlled from parent)
  */
 interface FrequentQuestionsProps {
   onSelectQuestion: (question: string) => void;
@@ -30,13 +26,14 @@ interface FrequentQuestionsProps {
   isOpen: boolean;
 }
 
-/**
- * Single category component for better organization and performance
- */
-const QuestionCategorySection: React.FC<{
-  category: QuestionCategory;
-  onSelectQuestion: (question: string) => void;
-}> = ({ category, onSelectQuestion }) => {
+// Memoized question category component for better performance
+const QuestionCategorySection = memo(({ 
+  category, 
+  onSelectQuestion 
+}: { 
+  category: QuestionCategory; 
+  onSelectQuestion: (question: string) => void; 
+}) => {
   return (
     <div className="space-y-2">
       <h3 className="font-medium text-sm text-blue-600 dark:text-blue-400 mb-2 border-b pb-1">
@@ -57,69 +54,68 @@ const QuestionCategorySection: React.FC<{
       </div>
     </div>
   );
-};
+});
+
+QuestionCategorySection.displayName = "QuestionCategorySection";
+
+// List of frequent questions - moved outside component for better memory performance
+const questionCategories: QuestionCategory[] = [
+  {
+    title: "Sobre o Time",
+    questions: [
+      "Qual é a escalação atual da FURIA?",
+      "Quem são os jogadores titulares e reservas?",
+      "Qual é a função de cada jogador na equipe?",
+      "Quem é o técnico atual da FURIA?",
+    ]
+  },
+  {
+    title: "Jogos e Campeonatos",
+    questions: [
+      "Quando será o próximo jogo da FURIA?",
+      "Contra quem será a próxima partida?",
+      "Qual foi o resultado do último jogo?",
+      "Onde posso assistir às partidas da FURIA ao vivo?",
+      "Qual é o desempenho recente da FURIA nos campeonatos?",
+      "Quantos títulos a FURIA já conquistou?",
+    ]
+  },
+  {
+    title: "Estatísticas e Notícias",
+    questions: [
+      "Quais são as estatísticas individuais dos jogadores?",
+      "Quais são as últimas notícias sobre a FURIA?",
+      "Houve alguma mudança recente na equipe?",
+      "Quais são os próximos campeonatos em que a FURIA participará?",
+    ]
+  },
+  {
+    title: "Fãs e Suporte",
+    questions: [
+      "Onde posso comprar produtos oficiais da FURIA?",
+      "Há promoções ou lançamentos recentes na loja oficial?",
+      "Posso participar de enquetes ou quizzes sobre a equipe?",
+      "Como envio sugestões ou feedback?",
+      "Quais são os canais oficiais da FURIA nas redes sociais?",
+      "Como posso entrar em contato com o suporte da FURIA?",
+      "Quais são os horários de atendimento ao cliente?",
+      "A FURIA tem algum programa de fidelidade ou recompensas?",
+      "Quais são as políticas de devolução e troca da loja oficial?",
+      "Como posso acompanhar as estatísticas em tempo real durante os jogos?",
+      "A FURIA tem algum aplicativo oficial para dispositivos móveis?",
+    ]
+  }
+];
 
 const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   onSelectQuestion,
   onOpenChange,
   isOpen,
 }) => {
-  // No need for internal state - use parent state as single source of truth
-  
-  // Handle question selection
-  const handleQuestionClick = (question: string) => {
+  // Memoized handler for question selection
+  const handleQuestionClick = useCallback((question: string) => {
     onSelectQuestion(question);
-    // No need to set internal state or call onOpenChange as this is handled in the Chat component
-  };
-
-  // List of frequent questions - categorized for better organization
-  const questionCategories: QuestionCategory[] = [
-    {
-      title: "Sobre o Time",
-      questions: [
-        "Qual é a escalação atual da FURIA?",
-        "Quem são os jogadores titulares e reservas?",
-        "Qual é a função de cada jogador na equipe?",
-        "Quem é o técnico atual da FURIA?",
-      ]
-    },
-    {
-      title: "Jogos e Campeonatos",
-      questions: [
-        "Quando será o próximo jogo da FURIA?",
-        "Contra quem será a próxima partida?",
-        "Qual foi o resultado do último jogo?",
-        "Onde posso assistir às partidas da FURIA ao vivo?",
-        "Qual é o desempenho recente da FURIA nos campeonatos?",
-        "Quantos títulos a FURIA já conquistou?",
-      ]
-    },
-    {
-      title: "Estatísticas e Notícias",
-      questions: [
-        "Quais são as estatísticas individuais dos jogadores?",
-        "Quais são as últimas notícias sobre a FURIA?",
-        "Houve alguma mudança recente na equipe?",
-        "Quais são os próximos campeonatos em que a FURIA participará?",
-      ]
-    },
-    {
-      title: "Fãs e Suporte",
-      questions: [
-        "Onde posso comprar produtos oficiais da FURIA?",
-        "Há promoções ou lançamentos recentes na loja oficial?",
-        "Posso participar de enquetes ou quizzes sobre a equipe?",
-        "Como envio sugestões ou feedback?",
-        "Quais são os canais oficiais da FURIA nas redes sociais?",
-        "Como posso entrar em contato com o suporte da FURIA?",
-        "Quais são os horários de atendimento ao cliente?",
-        "A FURIA tem algum programa de fidelidade ou recompensas?",
-        "Quais são as políticas de devolução e troca da loja oficial?",
-        "Como posso acompanhar as estatísticas em tempo real durante os jogos?",
-        "A FURIA tem algum aplicativo oficial para dispositivos móveis?",
-      ]
-    }
-  ];
+  }, [onSelectQuestion]);
 
   return (
     <Collapsible 
@@ -139,7 +135,6 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
       </CollapsibleTrigger>
       <CollapsibleContent className="w-full overflow-hidden">
         <div className="rounded-lg border p-4 shadow-sm bg-white dark:bg-gray-800 mb-4">
-          {/* Altura responsiva com min/max para garantir usabilidade */}
           <ScrollArea className="max-h-48 min-h-48 pr-2 overflow-y-auto">
             <div className="space-y-6">
               {questionCategories.map((category, catIndex) => (
@@ -157,4 +152,4 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   );
 };
 
-export default React.memo(FrequentQuestions);
+export default memo(FrequentQuestions);
