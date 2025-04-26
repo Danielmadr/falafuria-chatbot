@@ -38,7 +38,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [faqsOpen, setFaqsOpen] = useState<boolean>(false);
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
   const [size, setSize] = useState<Size>({ width: 500, height: 600 });
-  const formRef = useRef<HTMLFormElement>(null);
+  const formRef = useRef<HTMLFormElement>(null) as React.RefObject<HTMLFormElement>;
   
   // Enhanced input handler (can add additional validation if needed)
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
