@@ -9,30 +9,7 @@ import Footer from "./Footer";
 import { Card } from "@/components/ui/card";
 import { useDrag } from "../hooks/useDrag";
 import { useResize } from "../hooks/useResize";
-
-/**
- * Position interface represents the x and y coordinates of the chat window
- */
-interface Position {
-  x: number;
-  y: number;
-}
-
-/**
- * Size interface represents the width and height of the chat window
- */
-interface Size {
-  width: number;
-  height: number;
-}
-
-/**
- * WindowSize interface represents the width and height of the browser window
- */
-interface WindowSize {
-  width: number;
-  height: number;
-}
+import { Position, Size, WindowSize } from "../../types/common";
 
 /**
  * Chat component is the main container for the chat interface.
@@ -62,7 +39,7 @@ const Chat: React.FC = () => {
   const HEADER_HEIGHT = 100;
   const FOOTER_HEIGHT = 70;
   const DEFAULT_WIDTH_PERCENTAGE = 0.4; // 40% of screen width
-  const DEFAULT_HEIGHT_PERCENTAGE = 0.7; // 70% of screen height
+  const DEFAULT_HEIGHT_PERCENTAGE = 0.8; // 80% of screen height
 
   /**
    * Calculate initial position and size based on window dimensions
@@ -87,6 +64,7 @@ const Chat: React.FC = () => {
    */
   const handleSelectQuestion = (question: string) => {
     setInput(question);
+    setFaqsOpen(false); // Close FAQs when a question is selected
     
     // Submit the form programmatically after state update
     setTimeout(() => {
@@ -95,9 +73,6 @@ const Chat: React.FC = () => {
         formRef.current.dispatchEvent(event);
       }
     }, 100);
-    
-    // Ensure FAQs are closed when a question is selected
-    setFaqsOpen(false);
   };
   
   /**
@@ -138,9 +113,10 @@ const Chat: React.FC = () => {
     return () => {
       window.removeEventListener("resize", updateWindowDimensions);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [windowSize.width, windowSize.height, size.width, size.height]);
 
-  // Handle FAQ section state change
+  // Handle FAQ section state change - ensures chat area closes when FAQs open
   const handleFAQsOpenChange = (isOpen: boolean) => {
     setFaqsOpen(isOpen);
   };

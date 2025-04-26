@@ -1,38 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-
-/**
- * Position interface represents the x and y coordinates of an element
- */
-interface Position {
-  x: number;
-  y: number;
-}
-
-/**
- * Size interface represents the width and height of an element
- */
-interface Size {
-  width: number;
-  height: number;
-}
-
-/**
- * WindowSize interface represents the width and height of the browser window
- */
-interface WindowSize {
-  width: number;
-  height: number;
-}
-
-/**
- * Constraints interface defines the boundaries for dragging operations
- */
-interface DragConstraints {
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-}
+import { Position, Size, WindowSize, DragConstraints } from '../../types/common';
 
 /**
  * UseDragProps interface defines the properties for the useDrag hook

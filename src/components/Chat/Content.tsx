@@ -1,16 +1,17 @@
-import { useRef, useEffect, useState, memo } from "react";
+import { useRef, useEffect, memo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Message } from "@ai-sdk/react";
 import { CardContent } from "@/components/ui/card";
 import FrequentQuestions from "./FrequentQuestions";
+import { Size } from "../../types/common";
 
 /**
  * ChatContent component manages the main content area of the chat interface
  * including message display and FAQ section.
  * 
  * @param {Message[]} messages - Array of chat messages to display
- * @param {Object} size - Width and height of the chat container
+ * @param {Size} size - Width and height of the chat container
  * @param {number} headerHeight - Height of the header section
  * @param {number} footerHeight - Height of the footer section
  * @param {Function} onSelectQuestion - Callback for when a FAQ is selected
@@ -19,7 +20,7 @@ import FrequentQuestions from "./FrequentQuestions";
  */
 interface ChatContentProps {
   messages: Message[];
-  size: { width: number; height: number };
+  size: Size;
   headerHeight: number;
   footerHeight: number;
   onSelectQuestion: (question: string) => void;
@@ -42,14 +43,14 @@ const ChatMessage = memo(({ message }: { message: Message }) => {
       }`}
     >
       {isUser ? (
-        <Avatar className="h-8 w-8 flex-shrink-0">
-          <AvatarImage src="" alt="User avatar" />
+        <Avatar className="h-12 w-12 flex-shrink-0 p-1">
+          <AvatarImage src="useravatar.png" alt="User avatar" />
           <AvatarFallback className="bg-blue-500 text-white">User</AvatarFallback>
         </Avatar>
       ) : (
-        <Avatar className="h-8 w-8 flex-shrink-0">
+        <Avatar className="h-12 w-12 flex-shrink-0 p-1" >
           <AvatarImage
-            src="/iavatar_black.png"
+            src="/iavatar.png"
             alt="AI assistant avatar"
           />
           <AvatarFallback className="bg-red-500 text-white">AI</AvatarFallback>
@@ -75,9 +76,8 @@ const ChatContent: React.FC<ChatContentProps> = ({
   onFAQsOpenChange,
   faqsOpen,
 }) => {
-  // State to track whether chat or FAQ should be displayed
-  const [showChat, setShowChat] = useState<boolean>(true);
-  
+  // Single source of truth - use parent's faqsOpen state to determine visibility
+  const showChat = !faqsOpen;
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -87,21 +87,13 @@ const ChatContent: React.FC<ChatContentProps> = ({
     }
   }, [messages, showChat]);
 
-  // Synchronize local state with parent faqsOpen state
-  useEffect(() => {
-    setShowChat(!faqsOpen);
-  }, [faqsOpen]);
-
   // Handle FAQ question selection
   const handleQuestionSelect = (question: string) => {
-    setShowChat(true); // Show chat area when question is selected
-    onSelectQuestion(question); // Pass question to parent component
+    onSelectQuestion(question); // This will close FAQs and send the question
   };
 
   // Handle FAQ section expand/collapse
   const handleFAQToggle = (isOpen: boolean) => {
-    // When FAQ is expanded, hide chat
-    setShowChat(!isOpen);
     onFAQsOpenChange(isOpen);
   };
 

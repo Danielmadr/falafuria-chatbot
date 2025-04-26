@@ -1,12 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-
-/**
- * Size interface represents the width and height of a resizable element
- */
-interface Size {
-  width: number;
-  height: number;
-}
+import { Size, ResizeConstraints } from '../../types/common';
 
 /**
  * ResizeStart interface represents the initial state when resizing begins,
@@ -15,16 +8,6 @@ interface Size {
 interface ResizeStart extends Size {
   x: number;
   y: number;
-}
-
-/**
- * Constraints interface defines boundaries for resizing operations
- */
-interface ResizeConstraints {
-  minWidth: number;
-  minHeight: number;
-  maxWidth?: number;
-  maxHeight?: number;
 }
 
 /**

@@ -27,11 +27,11 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
       <GripHorizontal className="h-5 w-5 text-gray-500 mr-2" />
       <CardTitle className="flex items-center justify-center w-full">
         <Image
-          src="/logo_black.png"
+          src="/logoIA.png"
           alt="FurAi Chat Logo"
-          width={80}
-          height={70}
-          className="w-24 h-auto pointer-events-none"
+          width={2000}
+          height={2500}
+          className="w-35 h-auto pointer-events-none"
           priority
           draggable="false"
           onDragStart={(e) => e.preventDefault()}

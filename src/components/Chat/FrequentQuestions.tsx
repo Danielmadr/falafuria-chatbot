@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -27,7 +27,7 @@ interface QuestionCategory {
 interface FrequentQuestionsProps {
   onSelectQuestion: (question: string) => void;
   onOpenChange: (isOpen: boolean) => void;
-  isOpen?: boolean;
+  isOpen: boolean;
 }
 
 /**
@@ -62,27 +62,14 @@ const QuestionCategorySection: React.FC<{
 const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   onSelectQuestion,
   onOpenChange,
-  isOpen = false,
+  isOpen,
 }) => {
-  const [internalOpen, setInternalOpen] = React.useState(isOpen);
+  // No need for internal state - use parent state as single source of truth
   
-  // Sync with parent component's state
-  useEffect(() => {
-    setInternalOpen(isOpen);
-  }, [isOpen]);
-  
-  // Handle open state change
-  const handleOpenChange = (open: boolean) => {
-    setInternalOpen(open);
-    onOpenChange(open);
-  };
-
   // Handle question selection
   const handleQuestionClick = (question: string) => {
     onSelectQuestion(question);
-    // Auto-close the FAQ section after selection
-    setInternalOpen(false);
-    onOpenChange(false);
+    // No need to set internal state or call onOpenChange as this is handled in the Chat component
   };
 
   // List of frequent questions - categorized for better organization
@@ -137,18 +124,18 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   return (
     <Collapsible 
       className="flex flex-col w-full" 
-      open={internalOpen} 
-      onOpenChange={handleOpenChange}
+      open={isOpen} 
+      onOpenChange={onOpenChange}
     >
       <CollapsibleTrigger 
         className="w-full rounded-lg p-3 shadow-sm mb-2 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-between hover:shadow-md transition-shadow"
-        aria-label={internalOpen ? "Fechar perguntas frequentes" : "Abrir perguntas frequentes"}
+        aria-label={isOpen ? "Fechar perguntas frequentes" : "Abrir perguntas frequentes"}
       >
         <div className="flex items-center gap-2">
           <HelpCircle size={18} className="text-blue-500" />
           <span className="font-medium">Perguntas Frequentes</span>
         </div>
-        {internalOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </CollapsibleTrigger>
       <CollapsibleContent className="w-full overflow-hidden">
         <div className="rounded-lg border p-4 shadow-sm bg-white dark:bg-gray-800 mb-4">
