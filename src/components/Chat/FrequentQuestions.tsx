@@ -1,65 +1,5 @@
-import React, { useCallback, memo } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../ui/collapsible";
-import { ScrollArea } from "../ui/scroll-area";
-import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
-
-/**
- * QuestionCategory represents a group of related questions
- */
-interface QuestionCategory {
-  title: string;
-  questions: string[];
-}
-
-/**
- * FrequentQuestions component displays a collapsible list of predefined questions
- * that users can select to quickly interact with the chat.
- */
-interface FrequentQuestionsProps {
-  onSelectQuestion: (question: string) => void;
-  onOpenChange: (isOpen: boolean) => void;
-  isOpen: boolean;
-}
-
-// Memoized question category component for better performance
-const QuestionCategorySection = memo(({ 
-  category, 
-  onSelectQuestion 
-}: { 
-  category: QuestionCategory; 
-  onSelectQuestion: (question: string) => void; 
-}) => {
-  return (
-    <div className="space-y-2">
-      <h3 className="font-medium text-sm text-blue-600 dark:text-blue-400 mb-2 border-b pb-1">
-        {category.title}
-      </h3>
-      <div className="space-y-1">
-        {category.questions.map((question, qIndex) => (
-          <Button
-            key={qIndex}
-            variant="ghost"
-            size="sm"
-            className="justify-start text-left h-auto w-full py-2 px-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 whitespace-normal break-words"
-            onClick={() => onSelectQuestion(question)}
-          >
-            <span className="text-left">{question}</span>
-          </Button>
-        ))}
-      </div>
-    </div>
-  );
-});
-
-QuestionCategorySection.displayName = "QuestionCategorySection";
-
-// List of frequent questions - moved outside component for better memory performance
-const questionCategories: QuestionCategory[] = [
+// Define question categories outside of component to prevent recreation on each render
+const QUESTION_CATEGORIES = [
   {
     title: "Sobre o Time",
     questions: [
@@ -107,12 +47,79 @@ const questionCategories: QuestionCategory[] = [
   }
 ];
 
+import React, { useCallback, memo } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible";
+import { ScrollArea } from "../ui/scroll-area";
+import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
+
+/**
+ * QuestionCategory represents a group of related questions
+ */
+interface QuestionCategory {
+  title: string;
+  questions: string[];
+}
+
+/**
+ * FrequentQuestions component displays a collapsible list of predefined questions
+ * that users can select to quickly interact with the chat.
+ */
+interface FrequentQuestionsProps {
+  onSelectQuestion: (question: string) => void;
+  onOpenChange: (isOpen: boolean) => void;
+  isOpen: boolean;
+}
+
+// Create a stable callback function for question selection within category section
+const createQuestionSelector = (onSelectQuestion: (q: string) => void) => 
+  (question: string) => onSelectQuestion(question);
+
+// Memoized question category component for better performance
+const QuestionCategorySection = memo(({ 
+  category, 
+  onSelectQuestion 
+}: { 
+  category: QuestionCategory; 
+  onSelectQuestion: (question: string) => void; 
+}) => {
+  // Create a stable selector function once
+  const selectQuestion = useCallback(createQuestionSelector(onSelectQuestion), [onSelectQuestion]);
+  
+  return (
+    <div className="space-y-2">
+      <h3 className="font-medium text-sm text-blue-600 dark:text-blue-400 mb-2 border-b pb-1">
+        {category.title}
+      </h3>
+      <div className="space-y-1">
+        {category.questions.map((question, qIndex) => (
+          <Button
+            key={qIndex}
+            variant="ghost"
+            size="sm"
+            className="justify-start text-left h-auto w-full py-2 px-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 whitespace-normal break-words"
+            onClick={() => selectQuestion(question)}
+          >
+            <span className="text-left">{question}</span>
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+});
+
+QuestionCategorySection.displayName = "QuestionCategorySection";
+
 const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   onSelectQuestion,
   onOpenChange,
   isOpen,
 }) => {
-  // Memoized handler for question selection
+  // Create stable handler with useCallback to prevent rerenders
   const handleQuestionClick = useCallback((question: string) => {
     onSelectQuestion(question);
   }, [onSelectQuestion]);
@@ -137,7 +144,7 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
         <div className="rounded-lg border p-4 shadow-sm bg-white dark:bg-gray-800 mb-4">
           <ScrollArea className="max-h-48 min-h-48 pr-2 overflow-y-auto">
             <div className="space-y-6">
-              {questionCategories.map((category, catIndex) => (
+              {QUESTION_CATEGORIES.map((category, catIndex) => (
                 <QuestionCategorySection
                   key={catIndex}
                   category={category}

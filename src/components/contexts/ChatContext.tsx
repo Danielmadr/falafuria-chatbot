@@ -3,12 +3,19 @@ import { useChat as useAIChat, Message } from "@ai-sdk/react";
 import { Position, Size } from '../../types/common';
 
 interface ChatContextType {
+  // Chat state
   messages: Message[];
   input: string;
   isLoading: boolean;
+  
+  // Chat actions
   handleInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   setInput: (value: string) => void;
+  selectQuestion: (question: string) => void;
+  resetChat: () => void;
+  
+  // UI state
   faqsOpen: boolean;
   setFaqsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   position: Position;
@@ -16,10 +23,9 @@ interface ChatContextType {
   size: Size;
   setSize: React.Dispatch<React.SetStateAction<Size>>;
   formRef: React.RefObject<HTMLFormElement>;
-  selectQuestion: (question: string) => void;
-  resetChat: () => void;
 }
 
+// Create context with safe default values
 const ChatContext = createContext<ChatContextType | null>(null);
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -34,13 +40,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     reload 
   } = useAIChat();
   
-  // Local state
+  // Local UI state
   const [faqsOpen, setFaqsOpen] = useState<boolean>(false);
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
   const [size, setSize] = useState<Size>({ width: 500, height: 600 });
-  const formRef = useRef<HTMLFormElement>(null) as React.RefObject<HTMLFormElement>;
+  const formRef = useRef<HTMLFormElement>(null);
   
-  // Enhanced input handler (can add additional validation if needed)
+  // Enhanced input handler with validation
   const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     baseHandleInputChange(event);
   }, [baseHandleInputChange]);
@@ -80,6 +86,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [baseSetInput, reload]);
   
+  // Provide all values to consuming components
   return (
     <ChatContext.Provider value={{
       messages,
@@ -110,3 +117,5 @@ export const useChat = () => {
   }
   return context;
 };
+
+// Remove useChatHandlers.ts entirely as its functionality is now consolidated here

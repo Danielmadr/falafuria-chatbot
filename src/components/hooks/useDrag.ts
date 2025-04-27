@@ -14,7 +14,7 @@ interface UseDragProps {
 
 /**
  * useDrag hook manages the dragging functionality for elements.
- * It handles mouse events, position constraints, and drag state.
+ * It handles mouse and touch events, position constraints, and drag state.
  * 
  * @param {Position} position - Current position of the element
  * @param {Function} setPosition - State setter function for updating position
@@ -32,6 +32,12 @@ export const useDrag = ({
 }: UseDragProps) => {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<Position>({ x: 0, y: 0 });
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  // Check if we're on a mobile device for different event handling
+  useEffect(() => {
+    setIsMobile('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
 
   // Default constraints if none provided
   const effectiveConstraints = constraints || {
@@ -42,9 +48,9 @@ export const useDrag = ({
   };
 
   /**
-   * Handles the start of a drag operation
+   * Handles the start of a drag operation via mouse
    */
-  const handleDragStart = useCallback((e: React.MouseEvent) => {
+  const handleDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     // Prevent drag if clicking on interactive elements
     if (
       e.target instanceof HTMLButtonElement ||
@@ -62,25 +68,47 @@ export const useDrag = ({
 
     e.preventDefault();
     setIsDragging(true);
-    setDragStart({ 
-      x: e.clientX - position.x, 
-      y: e.clientY - position.y 
-    });
+    
+    if ('touches' in e) {
+      // Touch event
+      setDragStart({ 
+        x: e.touches[0].clientX - position.x, 
+        y: e.touches[0].clientY - position.y 
+      });
+    } else {
+      // Mouse event
+      setDragStart({ 
+        x: e.clientX - position.x, 
+        y: e.clientY - position.y 
+      });
+    }
   }, [position]);
 
   /**
-   * Handles mouse movement during a drag operation
+   * Handles mouse/touch movement during a drag operation
    */
-  const handleDragMove = useCallback((e: MouseEvent) => {
+  const handleDragMove = useCallback((e: MouseEvent | TouchEvent) => {
     if (!isDragging) return;
+
+    let clientX: number, clientY: number;
+    
+    if ('touches' in e) {
+      // Touch event
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      // Mouse event
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
 
     const newX = Math.max(
       effectiveConstraints.minX,
-      Math.min(effectiveConstraints.maxX, e.clientX - dragStart.x)
+      Math.min(effectiveConstraints.maxX, clientX - dragStart.x)
     );
     const newY = Math.max(
       effectiveConstraints.minY,
-      Math.min(effectiveConstraints.maxY, e.clientY - dragStart.y)
+      Math.min(effectiveConstraints.maxY, clientY - dragStart.y)
     );
     
     setPosition({ x: newX, y: newY });
@@ -98,26 +126,43 @@ export const useDrag = ({
     if (isDragging) {
       // Add drag-related classes to body for UI feedback
       document.body.classList.add('dragging');
-      document.body.style.cursor = 'grabbing';
       
-      document.addEventListener('mousemove', handleDragMove);
-      document.addEventListener('mouseup', handleDragEnd);
-      
-      // Handle edge cases like mouse leaving the window
-      document.addEventListener('mouseleave', handleDragEnd);
+      if (isMobile) {
+        document.addEventListener('touchmove', handleDragMove as EventListener, { passive: false });
+        document.addEventListener('touchend', handleDragEnd);
+        document.addEventListener('touchcancel', handleDragEnd);
+      } else {
+        document.body.style.cursor = 'grabbing';
+        document.addEventListener('mousemove', handleDragMove as EventListener);
+        document.addEventListener('mouseup', handleDragEnd);
+        document.addEventListener('mouseleave', handleDragEnd);
+      }
     } else {
       document.body.classList.remove('dragging');
-      document.body.style.cursor = '';
+      if (!isMobile) {
+        document.body.style.cursor = '';
+      }
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleDragMove);
-      document.removeEventListener('mouseup', handleDragEnd);
-      document.removeEventListener('mouseleave', handleDragEnd);
+      if (isMobile) {
+        document.removeEventListener('touchmove', handleDragMove as EventListener);
+        document.removeEventListener('touchend', handleDragEnd);
+        document.removeEventListener('touchcancel', handleDragEnd);
+      } else {
+        document.removeEventListener('mousemove', handleDragMove as EventListener);
+        document.removeEventListener('mouseup', handleDragEnd);
+        document.removeEventListener('mouseleave', handleDragEnd);
+      }
       document.body.classList.remove('dragging');
       document.body.style.cursor = '';
     };
-  }, [isDragging, handleDragMove, handleDragEnd]);
+  }, [isDragging, handleDragMove, handleDragEnd, isMobile]);
 
-  return { isDragging, handleDragStart };
+  return { 
+    isDragging, 
+    handleDragStart,
+    // Pass additional handlers for direct touch events
+    handleTouchStart: isMobile ? handleDragStart : undefined 
+  };
 };

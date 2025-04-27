@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import ResizeHandle from "./ResizeHandle";
 import Header from "./Header";
 import Content from "./Content";
@@ -10,6 +10,8 @@ import { useDrag } from "../hooks/useDrag";
 import { useResize } from "../hooks/useResize";
 import { useWindowSize } from "../contexts/WindowSizeContext";
 import { useChat } from "../contexts/ChatContext";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, X } from "lucide-react";
 import {
   calculateInitialPositionAndSize,
   constrainPositionToViewport,
@@ -23,6 +25,7 @@ import {
  * - Drag and resize functionality
  * - Chat messages and input
  * - FAQ selection and visibility
+ * - Error handling
  */
 const Chat: React.FC = () => {
   // Get chat state from context
@@ -40,6 +43,9 @@ const Chat: React.FC = () => {
     faqsOpen,
     setFaqsOpen,
   } = useChat();
+
+  // Local state for error handling
+  const [error, setError] = useState<string | null>(null);
 
   // Get window dimensions from context
   const { windowSize } = useWindowSize();
@@ -112,6 +118,20 @@ const Chat: React.FC = () => {
     }
   }, [windowSize.width, windowSize.height, position, size, setPosition, setSize]);
 
+  // Error detection in messages
+  useEffect(() => {
+    // Check the last message for error indicators
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage && lastMessage.role === 'assistant' && 
+        (lastMessage.content.includes("Error:") || 
+         lastMessage.content.includes("Failed to") ||
+         lastMessage.content.includes("Could not process"))) {
+      setError("Ocorreu um erro na comunicação com o assistente. Por favor, tente novamente.");
+    } else {
+      setError(null);
+    }
+  }, [messages]);
+
   // Define drag and resize constraints based on window size
   const dragConstraints = {
     minX: 0,
@@ -138,6 +158,11 @@ const Chat: React.FC = () => {
     maxHeight: windowSize.height - position.y,
   });
 
+  // Handle closing the error alert
+  const handleErrorClose = () => {
+    setError(null);
+  };
+
   return (
     <div
       className="absolute max-w-full max-h-full"
@@ -154,6 +179,22 @@ const Chat: React.FC = () => {
       <Card className="w-full h-full relative flex flex-col overflow-hidden shadow-lg p-0 gap-0">
         <Header onMouseDown={handleDragStart} isDragging={isDragging} />
         <div className="flex-1 flex flex-col overflow-hidden">
+          {error && (
+            <Alert variant="destructive" className="mx-4 mt-2 mb-0">
+              <AlertCircle className="h-4 w-4" />
+              <div className="flex-1">
+                <AlertTitle>Erro</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </div>
+              <button 
+                onClick={handleErrorClose} 
+                className="inline-flex h-6 w-6 items-center justify-center rounded-md hover:bg-destructive/10"
+                aria-label="Fechar alerta de erro"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </Alert>
+          )}
           <Content
             messages={messages}
             size={size}

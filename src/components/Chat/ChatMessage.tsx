@@ -1,8 +1,9 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Message } from "@ai-sdk/react";
 import AvatarIcon from "../icons/AvatarIcon";
 import { AvatarImage } from "@radix-ui/react-avatar";
+import { useTheme } from "next-themes";
 
 interface ChatMessageProps {
   message: Message;
@@ -11,29 +12,8 @@ interface ChatMessageProps {
 // Use a stable, memoized component
 const ChatMessage = memo(({ message }: ChatMessageProps) => {
   const isUser = message.role === "user";
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
-
-  // Detect current theme
-  useEffect(() => {
-    // Function to check if theme is dark
-    const checkDarkTheme = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      setIsDarkTheme(isDark);
-    };
-
-    // Check theme initially
-    checkDarkTheme();
-
-    // Set up observer to detect theme changes
-    const observer = new MutationObserver(checkDarkTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class']
-    });
-
-    // Clean up observer when component unmounts
-    return () => observer.disconnect();
-  }, []); // Empty dependency array to run only once on mount
+  const { resolvedTheme } = useTheme();
+  const isDarkTheme = resolvedTheme === "dark";
 
   // Choose avatar image based on theme
   const userAvatarSrc = isDarkTheme ? "userAvatar-White.png" : "userAvatar-Black.png";
