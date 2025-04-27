@@ -1,6 +1,7 @@
+// components/Chat.tsx
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import ResizeHandle from "./ResizeHandle";
 import Header from "./Header";
 import Content from "./Content";
@@ -19,13 +20,17 @@ import {
 } from "../utils/layoutUtils";
 
 /**
+ * Constants for sizing constraints - defined outside component to prevent recreation
+ */
+const MIN_WIDTH = 300;
+const MIN_HEIGHT = 350;
+const HEADER_HEIGHT = 100;
+const FOOTER_HEIGHT = 70;
+const DEFAULT_WIDTH_PERCENTAGE = 0.4; // 40% of screen width
+const DEFAULT_HEIGHT_PERCENTAGE = 0.8; // 80% of screen height
+
+/**
  * Chat component is the main container for the chat interface.
- * It manages:
- * - Chat window position and size
- * - Drag and resize functionality
- * - Chat messages and input
- * - FAQ selection and visibility
- * - Error handling
  */
 const Chat: React.FC = () => {
   // Get chat state from context
@@ -42,32 +47,24 @@ const Chat: React.FC = () => {
     setSize,
     faqsOpen,
     setFaqsOpen,
+    error,
+    setError
   } = useChat();
-
-  // Local state for error handling
-  const [error, setError] = useState<string | null>(null);
 
   // Get window dimensions from context
   const { windowSize } = useWindowSize();
 
   // References
   const cardRef = useRef<HTMLDivElement>(null);
+  const isInitializedRef = useRef<boolean>(false);
 
-  // Constants for sizing constraints
-  const MIN_WIDTH = 300;
-  const MIN_HEIGHT = 350;
-  const HEADER_HEIGHT = 100;
-  const FOOTER_HEIGHT = 70;
-  const DEFAULT_WIDTH_PERCENTAGE = 0.4; // 40% of screen width
-  const DEFAULT_HEIGHT_PERCENTAGE = 0.8; // 80% of screen height
-
-  // Initialize window size and chat position/size
+  // Effect to handle initial positioning and window resize
   useEffect(() => {
     // Skip if window dimensions aren't available yet
     if (windowSize.width <= 0 || windowSize.height <= 0) return;
 
     // Set initial position/size if not already set
-    if (position.x === 0 && position.y === 0) {
+    if (!isInitializedRef.current) {
       const { position: initialPosition, size: initialSize } =
         calculateInitialPositionAndSize(
           windowSize.width,
@@ -79,15 +76,11 @@ const Chat: React.FC = () => {
         );
       setPosition(initialPosition);
       setSize(initialSize);
+      isInitializedRef.current = true;
+      return; // Exit early after initialization
     }
-  }, [windowSize.width, windowSize.height, position.x, position.y, setPosition, setSize]);
-
-  // Separate effect for position/size constraints to prevent cascading updates
-  useEffect(() => {
-    if (windowSize.width <= 0 || windowSize.height <= 0) return;
-    if (position.x === 0 && position.y === 0) return;
-
-    // Ensure chat window stays within viewport when window is resized
+    
+    // For subsequent resize events, constrain both size and position
     const constrainedSize = constrainSize(
       size,
       MIN_WIDTH,
@@ -95,11 +88,8 @@ const Chat: React.FC = () => {
       windowSize.width,
       windowSize.height
     );
-
-    if (
-      constrainedSize.width !== size.width ||
-      constrainedSize.height !== size.height
-    ) {
+    
+    if (constrainedSize.width !== size.width || constrainedSize.height !== size.height) {
       setSize(constrainedSize);
     }
 
@@ -110,27 +100,10 @@ const Chat: React.FC = () => {
       windowSize.height
     );
 
-    if (
-      constrainedPosition.x !== position.x ||
-      constrainedPosition.y !== position.y
-    ) {
+    if (constrainedPosition.x !== position.x || constrainedPosition.y !== position.y) {
       setPosition(constrainedPosition);
     }
   }, [windowSize.width, windowSize.height, position, size, setPosition, setSize]);
-
-  // Error detection in messages
-  useEffect(() => {
-    // Check the last message for error indicators
-    const lastMessage = messages[messages.length - 1];
-    if (lastMessage && lastMessage.role === 'assistant' && 
-        (lastMessage.content.includes("Error:") || 
-         lastMessage.content.includes("Failed to") ||
-         lastMessage.content.includes("Could not process"))) {
-      setError("Ocorreu um erro na comunicação com o assistente. Por favor, tente novamente.");
-    } else {
-      setError(null);
-    }
-  }, [messages]);
 
   // Define drag and resize constraints based on window size
   const dragConstraints = {
@@ -171,6 +144,7 @@ const Chat: React.FC = () => {
         top: position.y,
         width: size.width,
         height: size.height,
+        transition: 'width 0.1s, height 0.1s' // Smooth transition for resize
       }}
       ref={cardRef}
       role="dialog"

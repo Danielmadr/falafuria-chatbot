@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Moon, Sun, Settings, TypeBold, Type } from "lucide-react";
+import { Moon, Sun, Settings, Type } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
   Sheet,
@@ -120,7 +120,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ className }) => {
                 onValueChange={handleFontSizeChange}
                 className="flex-1"
               />
-              <TypeBold className="h-4 w-4" />
+              <Type className="h-4 w-4" />
             </div>
           </div>
         </div>

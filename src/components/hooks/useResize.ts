@@ -1,5 +1,7 @@
+// hooks/useResize.ts
 import { useState, useEffect, useCallback } from 'react';
 import { Size, ResizeConstraints } from '../../types/common';
+import { throttle, addEventListeners } from '../utils/common';
 
 /**
  * ResizeStart interface represents the initial state when resizing begins,
@@ -90,6 +92,12 @@ export const useResize = ({
     setSize({ width: newWidth, height: newHeight });
   }, [isResizing, resizeStart, minWidth, minHeight, maxWidth, maxHeight, setSize]);
 
+  // Create throttled version of move handler
+  const throttledHandleResizeMove = useCallback(
+    throttle(handleResizeMove, 16), // ~60fps
+    [handleResizeMove]
+  );
+
   /**
    * Handles the end of a resize operation
    */
@@ -99,21 +107,23 @@ export const useResize = ({
 
   // Add and remove event listeners for resize operations
   useEffect(() => {
-    if (isResizing) {
-      document.addEventListener('mousemove', handleResizeMove);
-      document.addEventListener('mouseup', handleResizeEnd);
-      
-      // Add a class to the body to prevent text selection during resize
-      document.body.classList.add('resize-active');
-    }
+    if (!isResizing) return;
+    
+    // Add a class to the body to prevent text selection during resize
+    document.body.classList.add('resize-active');
+    
+    // Use the consolidated event listener utility
+    const removeListeners = addEventListeners(document, {
+      'mousemove': throttledHandleResizeMove,
+      'mouseup': handleResizeEnd
+    });
 
     // Cleanup function to remove event listeners
     return () => {
-      document.removeEventListener('mousemove', handleResizeMove);
-      document.removeEventListener('mouseup', handleResizeEnd);
+      removeListeners();
       document.body.classList.remove('resize-active');
     };
-  }, [isResizing, handleResizeMove, handleResizeEnd]);
+  }, [isResizing, throttledHandleResizeMove, handleResizeEnd]);
 
   return { isResizing, handleResizeStart, handleResizeEnd };
 };
