@@ -1,17 +1,17 @@
 // components/Chat.tsx
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import ResizeHandle from "./ResizeHandle";
 import Header from "./Header";
 import Content from "./Content";
 import Footer from "./Footer";
-import { Card } from "@/components/ui/card";
+import { Card } from "../ui/card";
 import { useDrag } from "../hooks/useDrag";
 import { useResize } from "../hooks/useResize";
 import { useWindowSize } from "../contexts/WindowSizeContext";
 import { useChat } from "../contexts/ChatContext";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { AlertCircle, X } from "lucide-react";
 import {
   calculateInitialPositionAndSize,
@@ -48,7 +48,7 @@ const Chat: React.FC = () => {
     faqsOpen,
     setFaqsOpen,
     error,
-    setError
+    setError,
   } = useChat();
 
   // Get window dimensions from context
@@ -79,7 +79,7 @@ const Chat: React.FC = () => {
       isInitializedRef.current = true;
       return; // Exit early after initialization
     }
-    
+
     // For subsequent resize events, constrain both size and position
     const constrainedSize = constrainSize(
       size,
@@ -88,8 +88,11 @@ const Chat: React.FC = () => {
       windowSize.width,
       windowSize.height
     );
-    
-    if (constrainedSize.width !== size.width || constrainedSize.height !== size.height) {
+
+    if (
+      constrainedSize.width !== size.width ||
+      constrainedSize.height !== size.height
+    ) {
       setSize(constrainedSize);
     }
 
@@ -100,10 +103,20 @@ const Chat: React.FC = () => {
       windowSize.height
     );
 
-    if (constrainedPosition.x !== position.x || constrainedPosition.y !== position.y) {
+    if (
+      constrainedPosition.x !== position.x ||
+      constrainedPosition.y !== position.y
+    ) {
       setPosition(constrainedPosition);
     }
-  }, [windowSize.width, windowSize.height, position, size, setPosition, setSize]);
+  }, [
+    windowSize.width,
+    windowSize.height,
+    position,
+    size,
+    setPosition,
+    setSize,
+  ]);
 
   // Define drag and resize constraints based on window size
   const dragConstraints = {
@@ -132,9 +145,7 @@ const Chat: React.FC = () => {
   });
 
   // Handle closing the error alert
-  const handleErrorClose = () => {
-    setError(null);
-  };
+  const handleErrorClose = useCallback(() => setError(null), [setError]);
 
   return (
     <div
@@ -144,7 +155,7 @@ const Chat: React.FC = () => {
         top: position.y,
         width: size.width,
         height: size.height,
-        transition: 'width 0.1s, height 0.1s' // Smooth transition for resize
+        transition: "width 0.1s, height 0.1s", // Smooth transition for resize
       }}
       ref={cardRef}
       role="dialog"
@@ -160,8 +171,8 @@ const Chat: React.FC = () => {
                 <AlertTitle>Erro</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </div>
-              <button 
-                onClick={handleErrorClose} 
+              <button
+                onClick={handleErrorClose}
                 className="inline-flex h-6 w-6 items-center justify-center rounded-md hover:bg-destructive/10"
                 aria-label="Fechar alerta de erro"
               >

@@ -61,9 +61,9 @@ export const useDrag = ({
       target instanceof HTMLTextAreaElement ||
       (target instanceof HTMLElement && (
         target.classList.contains('resize-handle') ||
-        target.closest('button') || 
-        target.closest('input') ||
-        target.closest('textarea')
+        !!target.closest('button') || 
+        !!target.closest('input') ||
+        !!target.closest('textarea')
       ))
     );
   }, []);

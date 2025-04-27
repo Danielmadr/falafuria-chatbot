@@ -1,7 +1,7 @@
 import { useRef, useEffect, memo, useMemo } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "../ui/scroll-area";
 import { Message } from "@ai-sdk/react";
-import { CardContent } from "@/components/ui/card";
+import { CardContent } from "../ui/card";
 import FrequentQuestions from "./FrequentQuestions";
 import { Size } from "../../types/common";
 import ChatMessage from "./ChatMessage";
@@ -25,10 +25,14 @@ interface ChatContentProps {
  * EmptyChat displays a message when no messages are present
  */
 const EmptyChat = memo(() => (
-  <div className="flex items-center justify-center h-full text-gray-400 text-center p-4" role="status" aria-live="polite">
+  <div
+    className="flex items-center justify-center h-full text-gray-400 text-center p-4"
+    role="status"
+    aria-live="polite"
+  >
     <p>
-      Selecione uma pergunta frequente ou envie uma mensagem para
-      começar a conversa.
+      Selecione uma pergunta frequente ou envie uma mensagem para começar a
+      conversa.
     </p>
   </div>
 ));
@@ -38,17 +42,22 @@ EmptyChat.displayName = "EmptyChat";
 /**
  * MessageList renders the list of chat messages
  */
-const MessageList = memo(({ messages, messagesEndRef }: { 
-  messages: Message[],
-  messagesEndRef: React.RefObject<HTMLDivElement>
-}) => (
-  <div className="space-y-2">
-    {messages.map((message) => (
-      <ChatMessage key={message.id} message={message} />
-    ))}
-    <div ref={messagesEndRef} aria-hidden="true" />
-  </div>
-));
+const MessageList = memo(
+  ({
+    messages,
+    messagesEndRef,
+  }: {
+    messages: Message[];
+    messagesEndRef: React.RefObject<HTMLDivElement>;
+  }) => (
+    <div className="space-y-2">
+      {messages.map((message) => (
+        <ChatMessage key={message.id} message={message} />
+      ))}
+      <div ref={messagesEndRef} aria-hidden="true" />
+    </div>
+  )
+);
 
 MessageList.displayName = "MessageList";
 
@@ -62,7 +71,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
 
   // Single source of truth - use parent's faqsOpen state to determine visibility
   const showChat = !faqsOpen;
-  
+
   // Reference for scroll behavior
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -74,7 +83,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
     if (messages.length === 0) {
       return <EmptyChat />;
     }
-    
+
     return <MessageList messages={messages} messagesEndRef={messagesEndRef} />;
   }, [messages]);
 
@@ -96,7 +105,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
 
       {/* Chat Messages Section - Only show when FAQs are not open */}
       {showChat && (
-        <div 
+        <div
           className="flex-1 overflow-hidden"
           aria-live="polite"
           aria-relevant="additions"

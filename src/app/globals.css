@@ -119,14 +119,6 @@
   }
 }
 
-/* Prevent text selection during resize */
-.resize-active {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-}
-
 /* Enhanced accessibility focus styles */
 .resize-handle:focus-visible,
 [role="button"]:focus-visible {
@@ -134,16 +126,10 @@
   outline-offset: 2px;
 }
 
-/* Animation for the resize handle */
-.resize-handle {
-  transition: opacity 0.2s ease;
-}
-
-.resize-handle:hover {
-  opacity: 1;
-}
-
-/* Ensure chat window is visible when using keyboard navigation */
-[role="dialog"]:focus-within {
-  z-index: 50;
+/* Prevent text selection during resize */
+.resize-active {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }

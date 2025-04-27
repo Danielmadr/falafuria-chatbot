@@ -114,7 +114,7 @@ export const useResize = ({
     
     // Use the consolidated event listener utility
     const removeListeners = addEventListeners(document, {
-      'mousemove': throttledHandleResizeMove,
+      'mousemove': throttledHandleResizeMove as EventListener,
       'mouseup': handleResizeEnd
     });
 

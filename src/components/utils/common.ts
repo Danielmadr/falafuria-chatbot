@@ -10,7 +10,7 @@ export function throttle<T extends (...args: any[]) => any>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean = false;
-  return function(this: any, ...args: Parameters<T>): void {
+  return function (this: any, ...args: Parameters<T>): void {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;
@@ -27,13 +27,13 @@ export function debounce<T extends (...args: any[]) => any>(
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout> | null = null;
-  
-  return function(this: any, ...args: Parameters<T>): void {
+
+  return function (this: any, ...args: Parameters<T>): void {
     const later = () => {
       timeout = null;
       func.apply(this, args);
     };
-    
+
     if (timeout !== null) {
       clearTimeout(timeout);
     }
@@ -45,7 +45,10 @@ export function debounce<T extends (...args: any[]) => any>(
  * Checks if the current device is mobile
  */
 export const isMobileDevice = (): boolean => {
-  return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  return (
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || navigator.maxTouchPoints > 0)
+  );
 };
 
 /**
@@ -59,7 +62,7 @@ export const addEventListeners = (
   Object.entries(events).forEach(([event, handler]) => {
     element.addEventListener(event, handler, options);
   });
-  
+
   return () => {
     Object.entries(events).forEach(([event, handler]) => {
       element.removeEventListener(event, handler, options);
