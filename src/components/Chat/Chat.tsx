@@ -73,8 +73,13 @@ const Chat: React.FC = () => {
         );
       setPosition(initialPosition);
       setSize(initialSize);
-      return;
     }
+  }, [windowSize.width, windowSize.height, position.x, position.y, setPosition, setSize]);
+
+  // Separate effect for position/size constraints to prevent cascading updates
+  useEffect(() => {
+    if (windowSize.width <= 0 || windowSize.height <= 0) return;
+    if (position.x === 0 && position.y === 0) return;
 
     // Ensure chat window stays within viewport when window is resized
     const constrainedSize = constrainSize(
@@ -105,7 +110,7 @@ const Chat: React.FC = () => {
     ) {
       setPosition(constrainedPosition);
     }
-  }, [windowSize, position, size, setPosition, setSize]);
+  }, [windowSize.width, windowSize.height, position, size, setPosition, setSize]);
 
   // Define drag and resize constraints based on window size
   const dragConstraints = {

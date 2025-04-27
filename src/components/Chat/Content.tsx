@@ -44,7 +44,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
     if (messagesEndRef.current && showChat) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, showChat]);
+  }, [messages.length, showChat]); // Only depend on messages.length, not the entire messages array
 
   // Handle FAQ question selection
   const handleQuestionSelect = (question: string) => {
@@ -77,12 +77,12 @@ const ChatContent: React.FC<ChatContentProps> = ({
                 </p>
               </div>
             ) : (
-              <>
+              <div className="space-y-2">
                 {messages.map((message) => (
                   <ChatMessage key={message.id} message={message} />
                 ))}
                 <div ref={messagesEndRef} />
-              </>
+              </div>
             )}
           </ScrollArea>
         </div>
@@ -91,4 +91,5 @@ const ChatContent: React.FC<ChatContentProps> = ({
   );
 };
 
+// Use React.memo to prevent unnecessary re-renders
 export default memo(ChatContent);

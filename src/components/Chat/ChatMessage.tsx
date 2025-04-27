@@ -8,33 +8,34 @@ interface ChatMessageProps {
   message: Message;
 }
 
+// Use a stable, memoized component
 const ChatMessage = memo(({ message }: ChatMessageProps) => {
   const isUser = message.role === "user";
   const [isDarkTheme, setIsDarkTheme] = useState(false);
 
-  // Detectar o tema atual usando o atributo data-theme ou classe dark
+  // Detect current theme
   useEffect(() => {
-    // Função para verificar se o tema é escuro
+    // Function to check if theme is dark
     const checkDarkTheme = () => {
       const isDark = document.documentElement.classList.contains('dark');
       setIsDarkTheme(isDark);
     };
 
-    // Verificar o tema inicialmente
+    // Check theme initially
     checkDarkTheme();
 
-    // Configurar um observador para detectar mudanças no tema
+    // Set up observer to detect theme changes
     const observer = new MutationObserver(checkDarkTheme);
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class']
     });
 
-    // Limpar o observador quando o componente for desmontado
+    // Clean up observer when component unmounts
     return () => observer.disconnect();
-  }, []);
+  }, []); // Empty dependency array to run only once on mount
 
-  // Escolher a imagem do avatar com base no tema
+  // Choose avatar image based on theme
   const userAvatarSrc = isDarkTheme ? "userAvatar-White.png" : "userAvatar-Black.png";
 
   return (
