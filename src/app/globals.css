@@ -119,8 +119,6 @@
   }
 }
 
-/* Add this to your global CSS file */
-
 /* Prevent text selection during resize */
 .resize-active {
   user-select: none;

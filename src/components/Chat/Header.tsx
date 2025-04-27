@@ -1,7 +1,7 @@
 import React from "react";
-import Image from "next/image";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { GripHorizontal } from "lucide-react";
+import SvgIcon from "../icons/LogoIcon";
 
 interface ChatHeaderProps {
   onMouseDown: (e: React.MouseEvent) => void;
@@ -11,7 +11,7 @@ interface ChatHeaderProps {
 const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
   return (
     <CardHeader
-      className={`pt-4 pb-0 flex flex-row items-center bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-b ${
+      className={`pt-5 flex flex-row items-center bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-b ${
         isDragging ? "cursor-grabbing" : "cursor-grab"
       }`}
       onMouseDown={onMouseDown}
@@ -26,15 +26,14 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
     >
       <GripHorizontal className="h-5 w-5 text-gray-500 mr-2" />
       <CardTitle className="flex items-center justify-center w-full">
-        <Image
-          src="/logoIA.png"
-          alt="FurAi Chat Logo"
-          width={2000}
-          height={2500}
-          className="w-35 h-auto pointer-events-none"
-          priority
-          draggable="false"
-          onDragStart={(e) => e.preventDefault()}
+        <SvgIcon 
+          width={135} 
+          height={82} 
+          className="pointer-events-none" 
+          lightColor="#000000"
+          darkColor="#ffffff"
+          viewBox="0 0 1230.0001 750.00008"
+
         />
       </CardTitle>
     </CardHeader>
