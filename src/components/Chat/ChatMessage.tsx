@@ -1,10 +1,12 @@
+// components/ChatMessage.tsx
 import React from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Message } from "@ai-sdk/react";
-import AvatarIcon from "../icons/AvatarIcon";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { useTheme } from "next-themes";
 import { useChat } from "../contexts/ChatContext";
+import AvatarIcon from "../icons/AvatarIcon";
+import { getUserAvatarSrc } from "../utils/avatarUtils";
 
 interface ChatMessageProps {
   message: Message;
@@ -19,8 +21,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const { resolvedTheme } = useTheme();
   const { messageFontSize } = useChat();
 
-  const userAvatarSrc =
-    resolvedTheme === "dark" ? "userAvatar-White.png" : "userAvatar-Black.png";
+  const userAvatarSrc = getUserAvatarSrc(resolvedTheme);
 
   return (
     <div
@@ -48,7 +49,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             lightColor="#000000"
             darkColor="#ffffff"
             className="pointer-events-none"
-            viewBox="0 0 750.00000 750.00000"
+            viewBox="0 0 750 750"
           />
         )}
       </Avatar>
@@ -67,4 +68,4 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   );
 };
 
-export default ChatMessage;
+export default React.memo(ChatMessage);
