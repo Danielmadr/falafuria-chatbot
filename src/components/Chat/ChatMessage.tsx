@@ -1,4 +1,9 @@
-// components/ChatMessage.tsx
+/**
+ * ChatMessage Component
+ *
+ * Displays individual messages in the chat with different styling for user and AI messages.
+ * Features avatars and appropriate text formatting.
+ */
 import React from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Message } from "@ai-sdk/react";
@@ -8,13 +13,22 @@ import { useChat } from "../../contexts/ChatContext";
 import AvatarIcon from "../icons/AvatarIcon";
 import { getUserAvatarSrc } from "../../utils/avatarUtils";
 
+/**
+ * Props for the ChatMessage component
+ */
 interface ChatMessageProps {
+  /** The message object to display */
   message: Message;
 }
 
 /**
- * ChatMessage displays a single message in the chat interface
- * with appropriate styling based on whether it's from the user or AI
+ * ChatMessage Component
+ *
+ * Renders a single message in the chat with appropriate styling based on sender (user or AI).
+ * Includes avatar, sender name, and message content with proper formatting.
+ *
+ * @param {ChatMessageProps} props - The message data
+ * @returns {JSX.Element} The rendered message component
  */
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.role === "user";

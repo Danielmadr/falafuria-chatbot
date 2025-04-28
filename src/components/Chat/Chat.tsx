@@ -1,3 +1,12 @@
+/**
+ * Main Chat Component
+ *
+ * This component serves as the primary container for the chat interface.
+ * It handles positioning, resizing, and combines all chat subcomponents.
+ *
+ * @module Chat
+ */
+
 "use client";
 
 import { useRef } from "react";
@@ -6,7 +15,7 @@ import Header from "./Header";
 import Content from "./Content";
 import Footer from "./Footer";
 import ResizeHandle from "./ResizeHandle";
-import ErrorAlert from "./ErrorAlert"; 
+import ErrorAlert from "./ErrorAlert";
 import { useDrag } from "../../hooks/useDrag";
 import { useResize } from "../../hooks/useResize";
 import { useWindowSize } from "../../contexts/WindowSizeContext";
@@ -19,11 +28,22 @@ import {
   FOOTER_HEIGHT,
 } from "../constants/layout";
 
+/**
+ * Props for the Chat component
+ */
 interface ChatProps {
-  // Adding explicit interface for the component
   className?: string;
 }
 
+/**
+ * Chat Component
+ *
+ * A draggable, resizable chat interface that contains the header, content, and footer.
+ * It manages the positioning, sizing, and appearance of the chat window.
+ *
+ * @param {ChatProps} props - Component properties
+ * @returns {JSX.Element} The rendered chat component
+ */
 const Chat: React.FC<ChatProps> = ({ className }) => {
   const {
     messages,
@@ -55,7 +75,7 @@ const Chat: React.FC<ChatProps> = ({ className }) => {
     setPosition,
   });
 
-  // Calculate drag constraints
+  // Calculate drag constraints to keep window within viewport
   const dragConstraints = {
     minX: 0,
     minY: 0,
@@ -63,7 +83,7 @@ const Chat: React.FC<ChatProps> = ({ className }) => {
     maxY: Math.max(0, windowSize.height - size.height),
   };
 
-  // Handle dragging
+  // Set up drag functionality
   const { isDragging, handleDragStart } = useDrag({
     position,
     setPosition,
@@ -72,7 +92,7 @@ const Chat: React.FC<ChatProps> = ({ className }) => {
     constraints: dragConstraints,
   });
 
-  // Handle resizing
+  // Set up resize functionality
   const { isResizing, handleResizeStart } = useResize({
     size,
     setSize,

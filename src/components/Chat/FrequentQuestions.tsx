@@ -1,3 +1,8 @@
+/**
+ * FrequentQuestions Component
+ *
+ * A collapsible section that displays categorized frequently asked questions.
+ */
 import React, { memo } from "react";
 import { Button } from "../ui/button";
 import {
@@ -10,12 +15,28 @@ import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
 import { QuestionCategory } from "../../types/common";
 import { QUESTION_CATEGORIES } from "../../data/frequentQuestions";
 
+/**
+ * Props for the FrequentQuestions component
+ */
 interface FrequentQuestionsProps {
+  /** Callback for when a question is selected */
   onSelectQuestion: (question: string) => void;
+  /** Callback for when the open state changes */
   onOpenChange: (isOpen: boolean) => void;
+  /** Whether the component is expanded */
   isOpen: boolean;
 }
 
+/**
+ * QuestionCategorySection Component
+ *
+ * Displays a category of questions with a title and clickable question buttons.
+ *
+ * @param {Object} props - Component properties
+ * @param {QuestionCategory} props.category - The category data to display
+ * @param {Function} props.onSelectQuestion - Callback for question selection
+ * @returns {JSX.Element} The rendered category section
+ */
 const QuestionCategorySection = memo(
   ({
     category,
@@ -32,7 +53,7 @@ const QuestionCategorySection = memo(
         <div className="space-y-1">
           {category.questions.map((question) => (
             <Button
-              key={question} // Use question text as key (assumed unique)
+              key={question}
               variant="ghost"
               size="sm"
               className="justify-start text-left h-auto w-full py-2 px-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 whitespace-normal break-words"
@@ -49,6 +70,15 @@ const QuestionCategorySection = memo(
 
 QuestionCategorySection.displayName = "QuestionCategorySection";
 
+/**
+ * FrequentQuestions Component
+ *
+ * A collapsible panel that shows categorized FAQ questions that users can select.
+ * When expanded, displays scrollable question categories with clickable questions.
+ *
+ * @param {FrequentQuestionsProps} props - Component properties
+ * @returns {JSX.Element} The rendered FAQs component
+ */
 const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
   onSelectQuestion,
   onOpenChange,

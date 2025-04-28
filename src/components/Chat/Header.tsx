@@ -1,14 +1,33 @@
+/**
+ * Header Component
+ *
+ * The draggable top section of the chat window with the logo and settings.
+ */
 import React from "react";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { GripHorizontal } from "lucide-react";
 import SvgIcon from "../icons/LogoIcon";
 import SettingsDrawer from "../settings/SettingsDrawer";
 
+/**
+ * Props for the ChatHeader component
+ */
 interface ChatHeaderProps {
+  /** Handler for mouse down events to initiate dragging */
   onMouseDown: (e: React.MouseEvent) => void;
+  /** Whether the chat is currently being dragged */
   isDragging: boolean;
 }
 
+/**
+ * ChatHeader Component
+ *
+ * Displays the top header of the chat with a drag handle, logo, and settings button.
+ * The entire header is draggable to move the chat window.
+ *
+ * @param {ChatHeaderProps} props - Component properties
+ * @returns {JSX.Element} The rendered header component
+ */
 const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" || e.key === " ") {

@@ -1,4 +1,9 @@
-// components/Content.tsx
+/**
+ * Content Component
+ *
+ * The main content area of the chat that displays messages and FAQs.
+ * Handles scrolling and empty state display.
+ */
 import React, { useRef, useMemo } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import { CardContent } from "../ui/card";
@@ -10,15 +15,33 @@ import { useChat } from "../../contexts/ChatContext";
 import { useAutoScroll } from "../../hooks/useAutoScroll";
 import { Size } from "../../types/common";
 
+/**
+ * Props for the ChatContent component
+ */
 interface ChatContentProps {
+  /** Array of chat messages */
   messages: Message[];
+  /** Size dimensions for the chat window */
   size: Size;
+  /** Height of the header in pixels */
   headerHeight: number;
+  /** Height of the footer in pixels */
   footerHeight: number;
+  /** Callback for when FAQs open state changes */
   onFAQsOpenChange: (isOpen: boolean) => void;
+  /** Whether the FAQs panel is open */
   faqsOpen: boolean;
 }
 
+/**
+ * ChatContent Component
+ *
+ * Contains the main scrollable area with messages and the FAQs section.
+ * Handles the display of messages or empty state and auto-scrolling.
+ *
+ * @param {ChatContentProps} props - Component properties
+ * @returns {JSX.Element} The rendered content area
+ */
 const ChatContent: React.FC<ChatContentProps> = ({
   messages,
   onFAQsOpenChange,
@@ -30,6 +53,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   useAutoScroll(messagesEndRef, messages.length, showChat);
 
+  // Memoize message display to prevent unnecessary re-renders
   const messageDisplay = useMemo(() => {
     if (messages.length === 0) {
       return <EmptyChat />;

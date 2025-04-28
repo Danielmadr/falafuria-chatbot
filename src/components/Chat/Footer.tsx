@@ -1,16 +1,38 @@
+/**
+ * Footer Component
+ *
+ * The input area at the bottom of the chat where users can type and send messages.
+ */
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, SendHorizontal } from "lucide-react";
 import { forwardRef } from "react";
 import { CardFooter } from "../ui/card";
 
+/**
+ * Props for the ChatFooter component
+ */
 interface ChatFooterProps {
+  /** Current value of the input field */
   input: string;
+  /** Handler for input change events */
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** Handler for form submission */
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  /** Whether a message is currently being sent */
   isLoading?: boolean;
 }
 
+/**
+ * ChatFooter Component
+ *
+ * Provides the message input form at the bottom of the chat interface.
+ * Contains an input field and a send button with loading state.
+ *
+ * @param {ChatFooterProps} props - Component properties
+ * @param {React.Ref<HTMLFormElement>} ref - Reference to the form element
+ * @returns {JSX.Element} The rendered footer component
+ */
 const ChatFooter = forwardRef<HTMLFormElement, ChatFooterProps>(
   ({ input, handleInputChange, handleSubmit, isLoading = false }, ref) => {
     return (
