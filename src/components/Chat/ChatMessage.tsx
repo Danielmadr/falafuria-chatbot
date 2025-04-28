@@ -4,9 +4,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Message } from "@ai-sdk/react";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { useTheme } from "next-themes";
-import { useChat } from "../contexts/ChatContext";
+import { useChat } from "../../contexts/ChatContext";
 import AvatarIcon from "../icons/AvatarIcon";
-import { getUserAvatarSrc } from "../utils/avatarUtils";
+import { getUserAvatarSrc } from "../../utils/avatarUtils";
 
 interface ChatMessageProps {
   message: Message;

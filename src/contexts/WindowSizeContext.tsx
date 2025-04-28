@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { WindowSize } from "../../types/common";
+import { WindowSize } from "../types/common";
 
 interface WindowSizeContextType {
   windowSize: WindowSize;

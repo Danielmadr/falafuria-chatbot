@@ -1,4 +1,3 @@
-// Improved ChatContext.tsx
 import React, {
   createContext,
   useContext,
@@ -9,7 +8,7 @@ import React, {
   useReducer,
 } from "react";
 import { useChat as useAIChat, Message } from "@ai-sdk/react";
-import { Position, Size } from "../../types/common";
+import { Position, Size } from "../types/common";
 
 // Group related UI state
 interface UIState {

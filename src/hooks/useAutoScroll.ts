@@ -10,7 +10,7 @@ import { useEffect } from 'react';
  * @param delay Optional delay before scrolling (default: 100ms)
  */
 export const useAutoScroll = (
-  ref: React.RefObject<HTMLElement>,
+  ref: React.RefObject<HTMLDivElement | null>,
   dependencyCount: number,
   isVisible: boolean,
   delay: number = 100

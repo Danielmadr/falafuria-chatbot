@@ -62,7 +62,9 @@ const FrequentQuestions: React.FC<FrequentQuestionsProps> = ({
     >
       <CollapsibleTrigger
         className="w-full rounded-lg p-3 shadow-sm mb-2 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-between hover:shadow-md transition-shadow"
-        aria-label={isOpen ? "Fechar perguntas frequentes" : "Abrir perguntas frequentes"}
+        aria-label={
+          isOpen ? "Fechar perguntas frequentes" : "Abrir perguntas frequentes"
+        }
       >
         <div className="flex items-center gap-2">
           <HelpCircle size={18} className="text-blue-500" />

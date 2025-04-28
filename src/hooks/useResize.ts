@@ -1,7 +1,7 @@
 // hooks/useResize.ts
-import { useState, useEffect, useCallback } from 'react';
-import { Size, ResizeConstraints } from '../../types/common';
-import { throttle, addEventListeners } from '../utils/common';
+import { useState, useEffect, useCallback } from "react";
+import { Size, ResizeConstraints } from "../types/common";
+import { throttle, addEventListeners } from "../utils/common";
 
 /**
  * ResizeStart interface represents the initial state when resizing begins,
@@ -32,7 +32,7 @@ interface UseResizeResult {
 /**
  * useResize hook provides functionality for resizing elements with mouse events
  * It manages resize state, handles mouse events, and enforces dimension constraints
- * 
+ *
  * @param {UseResizeProps} props - Configuration options for the resize behavior
  * @returns {UseResizeResult} Object containing resize state and event handlers
  */
@@ -42,7 +42,7 @@ export const useResize = ({
   minWidth,
   minHeight,
   maxWidth = Infinity,
-  maxHeight = Infinity
+  maxHeight = Infinity,
 }: UseResizeProps): UseResizeResult => {
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [resizeStart, setResizeStart] = useState<ResizeStart>({
@@ -56,41 +56,47 @@ export const useResize = ({
    * Handles the start of a resize operation
    * Stores initial mouse position and element dimensions
    */
-  const handleResizeStart = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    setIsResizing(true);
-    setResizeStart({
-      x: e.clientX,
-      y: e.clientY,
-      width: size.width,
-      height: size.height,
-    });
-  }, [size.width, size.height]);
+  const handleResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      setIsResizing(true);
+      setResizeStart({
+        x: e.clientX,
+        y: e.clientY,
+        width: size.width,
+        height: size.height,
+      });
+    },
+    [size.width, size.height]
+  );
 
   /**
    * Handles mouse movement during a resize operation
    * Calculates new dimensions based on mouse position while respecting constraints
    */
-  const handleResizeMove = useCallback((e: MouseEvent) => {
-    if (!isResizing) return;
+  const handleResizeMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isResizing) return;
 
-    const deltaX = e.clientX - resizeStart.x;
-    const deltaY = e.clientY - resizeStart.y;
+      const deltaX = e.clientX - resizeStart.x;
+      const deltaY = e.clientY - resizeStart.y;
 
-    const newWidth = Math.max(
-      minWidth,
-      Math.min(maxWidth, resizeStart.width + deltaX)
-    );
-    
-    const newHeight = Math.max(
-      minHeight,
-      Math.min(maxHeight, resizeStart.height + deltaY)
-    );
+      const newWidth = Math.max(
+        minWidth,
+        Math.min(maxWidth, resizeStart.width + deltaX)
+      );
 
-    setSize({ width: newWidth, height: newHeight });
-  }, [isResizing, resizeStart, minWidth, minHeight, maxWidth, maxHeight, setSize]);
+      const newHeight = Math.max(
+        minHeight,
+        Math.min(maxHeight, resizeStart.height + deltaY)
+      );
+
+      setSize({ width: newWidth, height: newHeight });
+    },
+    [isResizing, resizeStart, minWidth, minHeight, maxWidth, maxHeight, setSize]
+  );
 
   // Create throttled version of move handler
   const throttledHandleResizeMove = useCallback(
@@ -108,20 +114,20 @@ export const useResize = ({
   // Add and remove event listeners for resize operations
   useEffect(() => {
     if (!isResizing) return;
-    
+
     // Add a class to the body to prevent text selection during resize
-    document.body.classList.add('resize-active');
-    
+    document.body.classList.add("resize-active");
+
     // Use the consolidated event listener utility
     const removeListeners = addEventListeners(document, {
-      'mousemove': throttledHandleResizeMove as EventListener,
-      'mouseup': handleResizeEnd
+      mousemove: throttledHandleResizeMove as EventListener,
+      mouseup: handleResizeEnd,
     });
 
     // Cleanup function to remove event listeners
     return () => {
       removeListeners();
-      document.body.classList.remove('resize-active');
+      document.body.classList.remove("resize-active");
     };
   }, [isResizing, throttledHandleResizeMove, handleResizeEnd]);
 

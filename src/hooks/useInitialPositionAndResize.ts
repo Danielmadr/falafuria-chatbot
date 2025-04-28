@@ -1,8 +1,17 @@
 // hooks/useInitialPositionAndResize.ts
 import { useEffect, useRef } from "react";
-import { calculateInitialPositionAndSize, constrainPositionToViewport, constrainSize } from "../utils/layoutUtils";
-import { MIN_WIDTH, MIN_HEIGHT, DEFAULT_WIDTH_PERCENTAGE, DEFAULT_HEIGHT_PERCENTAGE } from "../constants/layout";
-import { Size, Position } from "../../types/common"; // Assume you have these
+import {
+  calculateInitialPositionAndSize,
+  constrainPositionToViewport,
+  constrainSize,
+} from "../utils/layoutUtils";
+import {
+  MIN_WIDTH,
+  MIN_HEIGHT,
+  DEFAULT_WIDTH_PERCENTAGE,
+  DEFAULT_HEIGHT_PERCENTAGE,
+} from "../components/constants/layout";
+import { Size, Position } from "../types/common"; // Assume you have these
 
 interface Props {
   windowWidth: number;

@@ -1,5 +1,5 @@
 import Chat from "@/components/Chat/Chat";
-import AppWrapper from "@/components/app-wrapper";
+import AppWrapper from "@/components/layout/app-wrapper";
 
 export default function Home() {
   return (

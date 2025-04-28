@@ -1,6 +1,5 @@
 import { QuestionCategory } from "../types/common";
 
-// Define question categories outside of component to prevent recreation on each render
 export const QUESTION_CATEGORIES: QuestionCategory[] = [
   {
     title: "Sobre o Time",

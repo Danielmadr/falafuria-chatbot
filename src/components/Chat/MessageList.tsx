@@ -4,7 +4,7 @@ import ChatMessage from "./ChatMessage";
 
 interface MessageListProps {
   messages: Message[];
-  messagesEndRef: React.RefObject<HTMLDivElement>;
+  messagesEndRef: React.RefObject<HTMLDivElement| null>;
 }
 
 const MessageList: React.FC<MessageListProps> = ({ messages, messagesEndRef }) => (

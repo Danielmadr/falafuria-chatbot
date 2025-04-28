@@ -6,8 +6,8 @@ import { Message } from "@ai-sdk/react";
 import FrequentQuestions from "./FrequentQuestions";
 import EmptyChat from "./EmptyChat";
 import MessageList from "./MessageList";
-import { useChat } from "../contexts/ChatContext";
-import { useAutoScroll } from "../hooks/useAutoScroll";
+import { useChat } from "../../contexts/ChatContext";
+import { useAutoScroll } from "../../hooks/useAutoScroll";
 import { Size } from "../../types/common";
 
 interface ChatContentProps {

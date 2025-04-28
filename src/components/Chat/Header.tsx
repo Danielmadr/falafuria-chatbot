@@ -32,17 +32,17 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
         <GripHorizontal className="h-5 w-5 text-gray-500 mr-2" />
       </div>
       <CardTitle className="flex items-center justify-center">
-        <SvgIcon 
-          width={135} 
-          height={82} 
-          className="pointer-events-none" 
+        <SvgIcon
+          width={135}
+          height={82}
+          className="pointer-events-none"
           lightColor="#000000"
           darkColor="#ffffff"
           viewBox="0 0 1230 750"
         />
       </CardTitle>
       <div className="flex items-center">
-        <SettingsDrawer className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
+        <SettingsDrawer className=" text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" />
       </div>
     </CardHeader>
   );
