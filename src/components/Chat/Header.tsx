@@ -10,20 +10,23 @@ interface ChatHeaderProps {
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      (e.target as HTMLDivElement).click();
+    }
+  };
+
   return (
     <CardHeader
       className={`pt-5 flex flex-row items-center justify-between bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 border-b ${
         isDragging ? "cursor-grabbing" : "cursor-grab"
       }`}
       onMouseDown={onMouseDown}
+      onKeyDown={handleKeyDown}
       role="button"
       aria-label="Drag to move chat window"
       tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          onMouseDown(e as unknown as React.MouseEvent);
-        }
-      }}
     >
       <div className="flex items-center">
         <GripHorizontal className="h-5 w-5 text-gray-500 mr-2" />
@@ -35,7 +38,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onMouseDown, isDragging }) => {
           className="pointer-events-none" 
           lightColor="#000000"
           darkColor="#ffffff"
-          viewBox="0 0 1230.0001 750.00008"
+          viewBox="0 0 1230 750"
         />
       </CardTitle>
       <div className="flex items-center">
