@@ -35,18 +35,18 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ className }) => {
         <Button
           variant="ghost"
           className={`p-2 h-8 w-8 rounded-full ${className}`}
-          aria-label="Open settings"
+          aria-label="Abrir configurações"
         >
           <Settings className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-72">
+      <SheetContent className="w-72 px-3">
         <SheetHeader>
-          <SheetTitle>Settings</SheetTitle>
+          <SheetTitle>Configurações</SheetTitle>
         </SheetHeader>
         <div className="py-6 space-y-6">
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">Theme</h3>
+            <h3 className="text-sm font-medium">Tema</h3>
             <RadioGroup
               defaultValue={theme || "system"}
               onValueChange={(value) => setTheme(value)}
@@ -60,11 +60,11 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ className }) => {
                 />
                 <Label
                   htmlFor="theme-light"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-2 hover:bg-gray-100 hover:border-gray-200 cursor-pointer data-[state=checked]:border-blue-500"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white dark:bg-gray-800 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-200 dark:hover:border-gray-600 cursor-pointer data-[state=checked]:border-blue-500"
                   data-state={theme === "light" ? "checked" : "unchecked"}
                 >
                   <Sun className="h-5 w-5 mb-1" />
-                  <span className="text-xs">Light</span>
+                  <span className="text-xs">Claro</span>
                 </Label>
               </div>
               <div>
@@ -75,11 +75,11 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ className }) => {
                 />
                 <Label
                   htmlFor="theme-dark"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-2 hover:bg-gray-100 hover:border-gray-200 cursor-pointer data-[state=checked]:border-blue-500"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white dark:bg-gray-800 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-200 dark:hover:border-gray-600 cursor-pointer data-[state=checked]:border-blue-500"
                   data-state={theme === "dark" ? "checked" : "unchecked"}
                 >
                   <Moon className="h-5 w-5 mb-1" />
-                  <span className="text-xs">Dark</span>
+                  <span className="text-xs">Escuro</span>
                 </Label>
               </div>
               <div>
@@ -90,14 +90,14 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ className }) => {
                 />
                 <Label
                   htmlFor="theme-system"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-2 hover:bg-gray-100 hover:border-gray-200 cursor-pointer data-[state=checked]:border-blue-500"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white dark:bg-gray-800 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-200 dark:hover:border-gray-600 cursor-pointer data-[state=checked]:border-blue-500"
                   data-state={theme === "system" ? "checked" : "unchecked"}
                 >
                   <div className="flex">
                     <Sun className="h-4 w-4" />
                     <Moon className="h-4 w-4" />
                   </div>
-                  <span className="text-xs">System</span>
+                  <span className="text-xs">Sistema</span>
                 </Label>
               </div>
             </RadioGroup>
@@ -105,7 +105,7 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ className }) => {
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium">Message Font Size</h3>
+              <h3 className="text-sm font-medium">Tamanho da Fonte</h3>
               <span className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
                 {fontSize}px
               </span>

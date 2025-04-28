@@ -1,39 +1,21 @@
-// components/Chat.tsx
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
-import ResizeHandle from "./ResizeHandle";
+import { useRef, useCallback } from "react";
+import { Card } from "../ui/card";
 import Header from "./Header";
 import Content from "./Content";
 import Footer from "./Footer";
-import { Card } from "../ui/card";
+import ResizeHandle from "./ResizeHandle";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { AlertCircle, X } from "lucide-react";
 import { useDrag } from "../hooks/useDrag";
 import { useResize } from "../hooks/useResize";
 import { useWindowSize } from "../contexts/WindowSizeContext";
 import { useChat } from "../contexts/ChatContext";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { AlertCircle, X } from "lucide-react";
-import {
-  calculateInitialPositionAndSize,
-  constrainPositionToViewport,
-  constrainSize,
-} from "../utils/layoutUtils";
+import { useInitialPositionAndResize } from "../hooks/useInitialPositionAndResize";
+import { MIN_WIDTH, MIN_HEIGHT, HEADER_HEIGHT, FOOTER_HEIGHT } from "../constants/layout";
 
-/**
- * Constants for sizing constraints - defined outside component to prevent recreation
- */
-const MIN_WIDTH = 300;
-const MIN_HEIGHT = 350;
-const HEADER_HEIGHT = 100;
-const FOOTER_HEIGHT = 70;
-const DEFAULT_WIDTH_PERCENTAGE = 0.4; // 40% of screen width
-const DEFAULT_HEIGHT_PERCENTAGE = 0.8; // 80% of screen height
-
-/**
- * Chat component is the main container for the chat interface.
- */
 const Chat: React.FC = () => {
-  // Get chat state from context
   const {
     messages,
     input,
@@ -51,74 +33,18 @@ const Chat: React.FC = () => {
     setError,
   } = useChat();
 
-  // Get window dimensions from context
   const { windowSize } = useWindowSize();
-
-  // References
   const cardRef = useRef<HTMLDivElement>(null);
-  const isInitializedRef = useRef<boolean>(false);
 
-  // Effect to handle initial positioning and window resize
-  useEffect(() => {
-    // Skip if window dimensions aren't available yet
-    if (windowSize.width <= 0 || windowSize.height <= 0) return;
-
-    // Set initial position/size if not already set
-    if (!isInitializedRef.current) {
-      const { position: initialPosition, size: initialSize } =
-        calculateInitialPositionAndSize(
-          windowSize.width,
-          windowSize.height,
-          MIN_WIDTH,
-          MIN_HEIGHT,
-          DEFAULT_WIDTH_PERCENTAGE,
-          DEFAULT_HEIGHT_PERCENTAGE
-        );
-      setPosition(initialPosition);
-      setSize(initialSize);
-      isInitializedRef.current = true;
-      return; // Exit early after initialization
-    }
-
-    // For subsequent resize events, constrain both size and position
-    const constrainedSize = constrainSize(
-      size,
-      MIN_WIDTH,
-      MIN_HEIGHT,
-      windowSize.width,
-      windowSize.height
-    );
-
-    if (
-      constrainedSize.width !== size.width ||
-      constrainedSize.height !== size.height
-    ) {
-      setSize(constrainedSize);
-    }
-
-    const constrainedPosition = constrainPositionToViewport(
-      position,
-      constrainedSize,
-      windowSize.width,
-      windowSize.height
-    );
-
-    if (
-      constrainedPosition.x !== position.x ||
-      constrainedPosition.y !== position.y
-    ) {
-      setPosition(constrainedPosition);
-    }
-  }, [
-    windowSize.width,
-    windowSize.height,
-    position,
+  useInitialPositionAndResize({
+    windowWidth: windowSize.width,
+    windowHeight: windowSize.height,
     size,
-    setPosition,
     setSize,
-  ]);
+    position,
+    setPosition,
+  });
 
-  // Define drag and resize constraints based on window size
   const dragConstraints = {
     minX: 0,
     minY: 0,
@@ -126,7 +52,6 @@ const Chat: React.FC = () => {
     maxY: Math.max(0, windowSize.height - size.height),
   };
 
-  // Setup drag and resize hooks with boundary constraints
   const { isDragging, handleDragStart } = useDrag({
     position,
     setPosition,
@@ -144,7 +69,6 @@ const Chat: React.FC = () => {
     maxHeight: windowSize.height - position.y,
   });
 
-  // Handle closing the error alert
   const handleErrorClose = useCallback(() => setError(null), [setError]);
 
   return (
@@ -155,7 +79,7 @@ const Chat: React.FC = () => {
         top: position.y,
         width: size.width,
         height: size.height,
-        transition: "width 0.1s, height 0.1s", // Smooth transition for resize
+        transition: "width 0.1s, height 0.1s",
       }}
       ref={cardRef}
       role="dialog"
