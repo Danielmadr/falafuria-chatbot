@@ -1,11 +1,24 @@
-// hooks/useResize.ts
+/**
+ * @module hooks/useResize
+ * @description A custom React hook that implements resizing functionality for UI elements.
+ * This hook provides mouse event handlers and state management for resizing operations
+ * while enforcing size constraints.
+ */
+
 import { useState, useEffect, useCallback } from "react";
 import { Size, ResizeConstraints } from "../types/common";
 import { throttle, addEventListeners } from "../utils/common";
 
 /**
- * ResizeStart interface represents the initial state when resizing begins,
- * including mouse position and element dimensions
+ * Represents the initial state when a resize operation begins.
+ * Stores initial mouse coordinates and element dimensions for reference.
+ *
+ * @interface ResizeStart
+ * @extends Size
+ * @property {number} x - Initial mouse X coordinate
+ * @property {number} y - Initial mouse Y coordinate
+ * @property {number} width - Initial element width
+ * @property {number} height - Initial element height
  */
 interface ResizeStart extends Size {
   x: number;
@@ -13,7 +26,12 @@ interface ResizeStart extends Size {
 }
 
 /**
- * UseResizeProps interface defines the input parameters for the useResize hook
+ * Input props for the useResize hook.
+ *
+ * @interface UseResizeProps
+ * @extends ResizeConstraints
+ * @property {Size} size - Current size of the resizable element
+ * @property {Function} setSize - State setter function to update element size
  */
 interface UseResizeProps extends ResizeConstraints {
   size: Size;
@@ -21,7 +39,12 @@ interface UseResizeProps extends ResizeConstraints {
 }
 
 /**
- * UseResizeResult interface defines the return values from the useResize hook
+ * Return values from the useResize hook.
+ *
+ * @interface UseResizeResult
+ * @property {boolean} isResizing - Flag indicating if a resize operation is in progress
+ * @property {Function} handleResizeStart - Event handler to initiate resizing
+ * @property {Function} handleResizeEnd - Event handler to terminate resizing
  */
 interface UseResizeResult {
   isResizing: boolean;
@@ -30,10 +53,10 @@ interface UseResizeResult {
 }
 
 /**
- * useResize hook provides functionality for resizing elements with mouse events
- * It manages resize state, handles mouse events, and enforces dimension constraints
+ * Custom hook that provides resizing functionality for UI elements.
+ * Handles mouse events, manages resize state, and enforces dimension constraints.
  *
- * @param {UseResizeProps} props - Configuration options for the resize behavior
+ * @param {UseResizeProps} props - Configuration options and state setters
  * @returns {UseResizeResult} Object containing resize state and event handlers
  */
 export const useResize = ({
@@ -53,8 +76,10 @@ export const useResize = ({
   });
 
   /**
-   * Handles the start of a resize operation
-   * Stores initial mouse position and element dimensions
+   * Initiates a resize operation when the user presses the mouse button.
+   * Captures initial mouse position and element dimensions.
+   *
+   * @param {React.MouseEvent} e - Mouse event object
    */
   const handleResizeStart = useCallback(
     (e: React.MouseEvent) => {
@@ -73,16 +98,20 @@ export const useResize = ({
   );
 
   /**
-   * Handles mouse movement during a resize operation
-   * Calculates new dimensions based on mouse position while respecting constraints
+   * Handles mouse movement during a resize operation.
+   * Calculates new dimensions based on mouse position delta and applies constraints.
+   *
+   * @param {MouseEvent} e - Mouse movement event
    */
   const handleResizeMove = useCallback(
     (e: MouseEvent) => {
       if (!isResizing) return;
 
+      // Calculate change in mouse position
       const deltaX = e.clientX - resizeStart.x;
       const deltaY = e.clientY - resizeStart.y;
 
+      // Apply changes to width/height with constraints
       const newWidth = Math.max(
         minWidth,
         Math.min(maxWidth, resizeStart.width + deltaX)
@@ -98,33 +127,34 @@ export const useResize = ({
     [isResizing, resizeStart, minWidth, minHeight, maxWidth, maxHeight, setSize]
   );
 
-  // Create throttled version of move handler
+  // Create performance-optimized version of move handler to prevent excessive updates
   const throttledHandleResizeMove = useCallback(
-    throttle(handleResizeMove, 16), // ~60fps
+    throttle(handleResizeMove, 16), // ~60fps for smooth resizing
     [handleResizeMove]
   );
 
   /**
-   * Handles the end of a resize operation
+   * Terminates a resize operation when the user releases the mouse button.
    */
   const handleResizeEnd = useCallback(() => {
     setIsResizing(false);
   }, []);
 
-  // Add and remove event listeners for resize operations
+  // Setup and cleanup event listeners for resize operations
   useEffect(() => {
     if (!isResizing) return;
 
-    // Add a class to the body to prevent text selection during resize
+    // Add a class to prevent text selection during resize
     document.body.classList.add("resize-active");
 
-    // Use the consolidated event listener utility
+    // Add global event listeners to track mouse movement
     const removeListeners = addEventListeners(document, {
       mousemove: throttledHandleResizeMove as EventListener,
       mouseup: handleResizeEnd,
     });
 
-    // Cleanup function to remove event listeners
+    // Cleanup function removes event listeners when component unmounts
+    // or when resize operation ends
     return () => {
       removeListeners();
       document.body.classList.remove("resize-active");

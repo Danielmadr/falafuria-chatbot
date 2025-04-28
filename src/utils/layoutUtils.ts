@@ -1,25 +1,52 @@
+/**
+ * layoutUtils.ts
+ *
+ * This module provides utility functions for calculating and managing
+ * UI element layouts, specifically for positioning and sizing elements
+ * responsively based on the viewport dimensions and device type.
+ */
+
 import { Position, Size } from "../types/common";
 import { isMobileDevice } from "./common";
 
-// Constants for layout calculations
+/**
+ * Layout configuration constants
+ */
+
+/** Percentage of window width to use on mobile devices */
 const MOBILE_WIDTH_PERCENTAGE = 0.9;
+
+/** Percentage of window height to use on mobile devices */
 const MOBILE_HEIGHT_PERCENTAGE = 0.7;
-const MOBILE_BREAKPOINT = 768; // Pixel width threshold for mobile
-const MOBILE_TOP_OFFSET_PERCENTAGE = 0.1; // Position at 10% from top for mobile
-const DESKTOP_HORIZONTAL_DIVISOR = 5; // Controls horizontal position on desktop
-const DESKTOP_VERTICAL_DIVISOR = 4; // Controls vertical position on desktop
+
+/** Viewport width threshold (in pixels) below which layout is treated as mobile */
+const MOBILE_BREAKPOINT = 768;
+
+/** Vertical position offset as a percentage of window height for mobile views */
+const MOBILE_TOP_OFFSET_PERCENTAGE = 0.1;
+
+/** Divisor that controls horizontal positioning on desktop views */
+const DESKTOP_HORIZONTAL_DIVISOR = 5;
+
+/** Divisor that controls vertical positioning on desktop views */
+const DESKTOP_VERTICAL_DIVISOR = 4;
 
 /**
- * Calculates initial position and size of the chat window based on window dimensions
- * and preferred proportions, with special handling for mobile devices.
+ * Calculates the initial position and size of a UI element based on the current viewport
+ * dimensions and configured proportions. Applies special handling for mobile devices.
  *
- * @param windowWidth Current width of the window in pixels
- * @param windowHeight Current height of the window in pixels
- * @param minWidth Minimum allowed width for the chat window in pixels
- * @param minHeight Minimum allowed height for the chat window in pixels
- * @param widthPercentage Percentage of window width to use (0-1)
- * @param heightPercentage Percentage of window height to use (0-1)
- * @returns Object containing calculated position and size
+ * The function ensures responsive layout behavior by:
+ * - Using different proportions for mobile vs desktop views
+ * - Enforcing minimum dimensions
+ * - Positioning elements appropriately based on device type
+ *
+ * @param windowWidth - Current width of the viewport in pixels
+ * @param windowHeight - Current height of the viewport in pixels
+ * @param minWidth - Minimum allowed width for the element in pixels
+ * @param minHeight - Minimum allowed height for the element in pixels
+ * @param widthPercentage - Desired width as a percentage of window width (0-1)
+ * @param heightPercentage - Desired height as a percentage of window height (0-1)
+ * @returns An object containing the calculated position and size
  */
 export const calculateInitialPositionAndSize = (
   windowWidth: number,
@@ -29,8 +56,10 @@ export const calculateInitialPositionAndSize = (
   widthPercentage: number,
   heightPercentage: number
 ): { position: Position; size: Size } => {
-  // Adjust percentages for mobile devices
+  // Determine if we should use mobile layout based on device detection or viewport width
   const isMobile = isMobileDevice() || windowWidth < MOBILE_BREAKPOINT;
+
+  // Adjust proportions based on device type
   const effectiveWidthPercentage = isMobile
     ? MOBILE_WIDTH_PERCENTAGE
     : widthPercentage;
@@ -38,6 +67,7 @@ export const calculateInitialPositionAndSize = (
     ? MOBILE_HEIGHT_PERCENTAGE
     : heightPercentage;
 
+  // Calculate dimensions while respecting minimum constraints
   const width = Math.max(
     minWidth,
     Math.floor(windowWidth * effectiveWidthPercentage)
@@ -47,15 +77,17 @@ export const calculateInitialPositionAndSize = (
     Math.floor(windowHeight * effectiveHeightPercentage)
   );
 
-  // Set position based on device type
+  // Calculate position based on device type
   let position: Position;
 
   if (isMobile) {
+    // For mobile: center horizontally and position at configured top offset
     position = {
-      x: Math.floor((windowWidth - width) / 2), // Center horizontally
+      x: Math.floor((windowWidth - width) / 2),
       y: Math.floor(windowHeight * MOBILE_TOP_OFFSET_PERCENTAGE),
     };
   } else {
+    // For desktop: use divisors to create offset positioning
     position = {
       x: Math.floor((windowWidth - width) / DESKTOP_HORIZONTAL_DIVISOR),
       y: Math.floor((windowHeight - height) / DESKTOP_VERTICAL_DIVISOR),
@@ -66,14 +98,17 @@ export const calculateInitialPositionAndSize = (
 };
 
 /**
- * Calculates a centered position for an element
+ * Calculates a position that centers an element within its container.
  *
- * @param elementWidth Width of the element to center
- * @param elementHeight Height of the element to center
- * @param containerWidth Width of the container
- * @param containerHeight Height of the container
- * @param verticalOffset Optional offset from perfect vertical center (positive moves down)
- * @returns Centered position coordinates
+ * This is useful for modal dialogs, tooltips, and other UI elements that
+ * should appear centered relative to their parent or the viewport.
+ *
+ * @param elementWidth - Width of the element to be centered in pixels
+ * @param elementHeight - Height of the element to be centered in pixels
+ * @param containerWidth - Width of the container element in pixels
+ * @param containerHeight - Height of the container element in pixels
+ * @param verticalOffset - Optional vertical adjustment from perfect center (positive moves downward) in pixels
+ * @returns Position coordinates for centering the element within its container
  */
 export const calculateCenteredPosition = (
   elementWidth: number,
@@ -89,13 +124,16 @@ export const calculateCenteredPosition = (
 };
 
 /**
- * Constrains position to ensure the element stays within the viewport
+ * Constrains a position to ensure an element stays completely within the viewport.
  *
- * @param position Current position coordinates
- * @param size Element size dimensions
- * @param windowWidth Window width in pixels
- * @param windowHeight Window height in pixels
- * @returns Constrained position that keeps the element in view
+ * This prevents UI elements from being positioned partially or completely
+ * outside the visible area, which could make them inaccessible to users.
+ *
+ * @param position - Current position coordinates of the element
+ * @param size - Current size dimensions of the element
+ * @param windowWidth - Current width of the viewport in pixels
+ * @param windowHeight - Current height of the viewport in pixels
+ * @returns Adjusted position that keeps the element within the viewport boundaries
  */
 export const constrainPositionToViewport = (
   position: Position,
@@ -110,14 +148,18 @@ export const constrainPositionToViewport = (
 };
 
 /**
- * Constrains size to ensure the element doesn't exceed min/max boundaries
+ * Constrains the size of an element to ensure it remains within specified minimum
+ * and maximum dimensions.
  *
- * @param size Current size dimensions
- * @param minWidth Minimum width in pixels
- * @param minHeight Minimum height in pixels
- * @param maxWidth Maximum width in pixels
- * @param maxHeight Maximum height in pixels
- * @returns Constrained size within the specified boundaries
+ * This is useful for implementing resizable UI elements that must maintain
+ * reasonable dimensions for usability and layout integrity.
+ *
+ * @param size - Current size dimensions of the element
+ * @param minWidth - Minimum allowed width in pixels
+ * @param minHeight - Minimum allowed height in pixels
+ * @param maxWidth - Maximum allowed width in pixels
+ * @param maxHeight - Maximum allowed height in pixels
+ * @returns Adjusted size that respects the specified dimension constraints
  */
 export const constrainSize = (
   size: Size,

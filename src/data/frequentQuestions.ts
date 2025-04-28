@@ -1,5 +1,13 @@
 import { QuestionCategory } from "../types/common";
 
+/**
+ * Predefined list of frequently asked questions organized by categories
+ * Used for the FAQs panel in the chat interface
+ *
+ * Each question category contains:
+ * - title: The name/theme of the category
+ * - questions: An array of predefined questions users can select
+ */
 export const QUESTION_CATEGORIES: QuestionCategory[] = [
   {
     title: "Sobre o Time",

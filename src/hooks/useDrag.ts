@@ -1,31 +1,40 @@
-// hooks/useDrag.ts
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Position, Size, WindowSize, DragConstraints } from "../types/common";
 import { throttle, isMobileDevice, addEventListeners } from "../utils/common";
 
 /**
- * UseDragProps interface defines the properties for the useDrag hook
+ * Props interface for the useDrag hook
+ * Contains all parameters needed to implement draggable functionality
  */
 interface UseDragProps {
-  position: Position;
-  setPosition: React.Dispatch<React.SetStateAction<Position>>;
-  windowSize: WindowSize;
-  size: Size;
-  constraints?: DragConstraints;
+  position: Position; // Current position
+  setPosition: React.Dispatch<React.SetStateAction<Position>>; // Function to update position
+  windowSize: WindowSize; // Current window dimensions
+  size: Size; // Size of the draggable element
+  constraints?: DragConstraints; // Optional drag boundaries
 }
 
 /**
- * UseDragResult interface defines the return values from the useDrag hook
+ * Return type for the useDrag hook
+ * Provides drag state and handler functions for consumers
  */
 interface UseDragResult {
-  isDragging: boolean;
-  handleDragStart: (e: React.MouseEvent | React.TouchEvent) => void;
-  handleTouchStart?: (e: React.TouchEvent) => void;
+  isDragging: boolean; // Whether dragging is in progress
+  handleDragStart: (e: React.MouseEvent | React.TouchEvent) => void; // Handler for starting drag
+  handleTouchStart?: (e: React.TouchEvent) => void; // Optional touch-specific handler
 }
 
 /**
- * useDrag hook manages the dragging functionality for elements.
- * It handles mouse and touch events, position constraints, and drag state.
+ * Custom hook that implements draggable functionality for elements
+ *
+ * Handles:
+ * - Mouse and touch events for cross-device compatibility
+ * - Position constraints to keep elements within boundaries
+ * - Drag state management
+ * - Event cleanup
+ *
+ * @param props - Configuration options for drag behavior
+ * @returns Object containing drag state and event handlers
  */
 export const useDrag = ({
   position,
@@ -43,16 +52,30 @@ export const useDrag = ({
     setIsMobile(isMobileDevice());
   }, []);
 
-  // Default constraints if none provided
-  const effectiveConstraints = constraints || {
-    minX: 0,
-    minY: 0,
-    maxX: Math.max(0, windowSize.width - size.width),
-    maxY: Math.max(0, windowSize.height - size.height),
-  };
+  // Memoize the constraints calculation to avoid recreating on every render
+  const effectiveConstraints = useMemo(() => {
+    return (
+      constraints || {
+        minX: 0,
+        minY: 0,
+        maxX: Math.max(0, windowSize.width - size.width),
+        maxY: Math.max(0, windowSize.height - size.height),
+      }
+    );
+  }, [
+    constraints,
+    windowSize.width,
+    windowSize.height,
+    size.width,
+    size.height,
+  ]);
 
   /**
    * Determines if the target element should prevent dragging
+   * Used to avoid dragging when interacting with controls within the draggable area
+   *
+   * @param target - DOM element that received the event
+   * @returns true if dragging should be prevented
    */
   const shouldPreventDrag = useCallback((target: HTMLElement): boolean => {
     return (
@@ -69,6 +92,9 @@ export const useDrag = ({
 
   /**
    * Handles the start of a drag operation via mouse or touch
+   * Stores initial position information and sets dragging state
+   *
+   * @param e - Mouse or touch event that initiated the drag
    */
   const handleDragStart = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
@@ -100,6 +126,9 @@ export const useDrag = ({
 
   /**
    * Handles mouse/touch movement during a drag operation
+   * Calculates new position based on movement while respecting constraints
+   *
+   * @param e - Mouse or touch move event
    */
   const handleDragMove = useCallback(
     (e: MouseEvent | TouchEvent) => {
@@ -117,6 +146,7 @@ export const useDrag = ({
         clientY = (e as MouseEvent).clientY;
       }
 
+      // Calculate new position with constraints
       const newX = Math.max(
         effectiveConstraints.minX,
         Math.min(effectiveConstraints.maxX, clientX - dragStart.x)
@@ -131,7 +161,7 @@ export const useDrag = ({
     [isDragging, dragStart, effectiveConstraints, setPosition]
   );
 
-  // Create throttled version of move handler
+  // Create throttled version of move handler for performance optimization
   const throttledHandleDragMove = useCallback(
     throttle(handleDragMove, 16), // ~60fps
     [handleDragMove]
@@ -139,6 +169,7 @@ export const useDrag = ({
 
   /**
    * Handles the end of a drag operation
+   * Resets dragging state when mouse/touch is released
    */
   const handleDragEnd = useCallback(() => {
     setIsDragging(false);
@@ -154,6 +185,7 @@ export const useDrag = ({
     let cleanup: () => void;
 
     if (isMobile) {
+      // Touch event listeners for mobile devices
       cleanup = addEventListeners(
         document,
         {
@@ -161,14 +193,15 @@ export const useDrag = ({
           touchend: handleDragEnd,
           touchcancel: handleDragEnd,
         },
-        { passive: false }
+        { passive: false } // Allow preventDefault in touchmove
       );
     } else {
+      // Mouse event listeners for desktop
       document.body.style.cursor = "grabbing";
       cleanup = addEventListeners(document, {
         mousemove: throttledHandleDragMove as EventListener,
         mouseup: handleDragEnd,
-        mouseleave: handleDragEnd,
+        mouseleave: handleDragEnd, // Handle mouse leaving window
       });
     }
 

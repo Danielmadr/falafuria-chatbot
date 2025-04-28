@@ -10,61 +10,76 @@ import React, {
 import { useChat as useAIChat, Message } from "@ai-sdk/react";
 import { Position, Size } from "../types/common";
 
-// Group related UI state
+/**
+ * UI state interface containing properties related to the chat UI appearance and positioning
+ */
 interface UIState {
-  faqsOpen: boolean;
-  messageFontSize: number;
-  position: Position;
-  size: Size;
+  faqsOpen: boolean; // Whether the FAQs panel is open
+  messageFontSize: number; // Font size for chat messages
+  position: Position; // Position of the chat window
+  size: Size; // Size of the chat window
 }
 
-// Group related error state
+/**
+ * Error state interface for tracking errors and their timestamps
+ */
 interface ErrorState {
-  message: string | null;
-  timestamp: number | null;
+  message: string | null; // Error message to display
+  timestamp: number | null; // When the error occurred (for auto-dismissal)
 }
 
+/**
+ * Interface defining all properties and methods available in the chat context
+ */
 interface ChatContextType {
   // Chat state
-  messages: Message[];
-  input: string;
-  isLoading: boolean;
+  messages: Message[]; // All messages in the conversation
+  input: string; // Current input value
+  isLoading: boolean; // Whether a message is being processed
 
   // Chat actions
-  handleInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  setInput: (value: string) => void;
-  selectQuestion: (question: string) => void;
-  resetChat: () => void;
+  handleInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void; // Handle changes to input field
+  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void; // Submit a new message
+  setInput: (value: string) => void; // Directly set input value
+  selectQuestion: (question: string) => void; // Select a predefined question
+  resetChat: () => void; // Reset the chat to initial state
 
   // UI state and actions
-  messageFontSize: number;
-  setMessageFontSize: (size: number) => void;
-  faqsOpen: boolean;
-  setFaqsOpen: (isOpen: boolean) => void;
-  position: Position;
-  setPosition: React.Dispatch<React.SetStateAction<Position>>;
-  size: Size;
-  setSize: React.Dispatch<React.SetStateAction<Size>>;
-  formRef: React.RefObject<HTMLFormElement | null>; // Updated type definition
+  messageFontSize: number; // Current message font size
+  setMessageFontSize: (size: number) => void; // Update font size
+  faqsOpen: boolean; // Whether FAQs panel is open
+  setFaqsOpen: (isOpen: boolean) => void; // Toggle FAQs panel
+  position: Position; // Current chat window position
+  setPosition: React.Dispatch<React.SetStateAction<Position>>; // Update position
+  size: Size; // Current chat window size
+  setSize: React.Dispatch<React.SetStateAction<Size>>; // Update size
+  formRef: React.RefObject<HTMLFormElement | null>; // Reference to the form element
 
   // Error handling
-  error: string | null;
-  setError: (message: string | null) => void;
-  dismissError: () => void;
+  error: string | null; // Current error message (if any)
+  setError: (message: string | null) => void; // Set an error message
+  dismissError: () => void; // Dismiss the current error
 }
 
-// Create context with safe default values
+// Create context with null default (will be checked in useChat hook)
 const ChatContext = createContext<ChatContextType | null>(null);
 
-// Action types for reducer
+/**
+ * Action types for the UI state reducer
+ */
 type UIAction =
   | { type: "SET_FAQS_OPEN"; payload: boolean }
   | { type: "SET_FONT_SIZE"; payload: number }
   | { type: "SET_POSITION"; payload: Position }
   | { type: "SET_SIZE"; payload: Size };
 
-// Reducer for UI state
+/**
+ * Reducer function for UI state management
+ *
+ * @param state - Current UI state
+ * @param action - Action to perform
+ * @returns Updated UI state
+ */
 const uiReducer = (state: UIState, action: UIAction): UIState => {
   switch (action.type) {
     case "SET_FAQS_OPEN":
@@ -80,6 +95,11 @@ const uiReducer = (state: UIState, action: UIAction): UIState => {
   }
 };
 
+/**
+ * Provider component that makes chat functionality available to the component tree
+ *
+ * @param children - Child components that will have access to the context
+ */
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -110,7 +130,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const formRef = useRef<HTMLFormElement>(null);
 
-  // Enhanced input handler
+  /**
+   * Enhanced input handler that also clears errors on input change
+   *
+   * @param event - Input change event
+   */
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       // Clear errors on input change
@@ -122,7 +146,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     [baseHandleInputChange, error.message]
   );
 
-  // Enhanced submit handler with input validation
+  /**
+   * Enhanced submit handler with input validation
+   *
+   * @param event - Form submit event
+   */
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -143,7 +171,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     [input, baseHandleSubmit]
   );
 
-  // Set input with validation
+  /**
+   * Set input with validation
+   *
+   * @param value - New input value
+   */
   const setInput = useCallback(
     (value: string) => {
       baseSetInput(value);
@@ -151,7 +183,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     [baseSetInput]
   );
 
-  // Helper to select a predefined question and trigger form submission
+  /**
+   * Helper to select a predefined question and trigger form submission
+   *
+   * @param question - The question text to be set as input
+   */
   const selectQuestion = useCallback(
     (question: string) => {
       baseSetInput(question);
@@ -171,7 +207,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     [baseSetInput]
   );
 
-  // Reset chat functionality
+  /**
+   * Reset chat functionality - clears input, errors, and reloads the chat
+   */
   const resetChat = useCallback(() => {
     baseSetInput("");
     setErrorState({ message: null, timestamp: null });
@@ -180,7 +218,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [baseSetInput, reload]);
 
-  // Error detection in messages - more robust implementation
+  /**
+   * Detects errors in assistant messages by looking for error patterns
+   */
   useEffect(() => {
     if (!messages.length) return;
 
@@ -209,7 +249,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [messages]);
 
-  // Auto-dismiss errors after 8 seconds
+  /**
+   * Auto-dismiss errors after 8 seconds
+   */
   useEffect(() => {
     if (error.timestamp) {
       const timer = setTimeout(() => {
@@ -220,15 +262,29 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [error.timestamp]);
 
-  // UI state setters
+  /**
+   * Toggle FAQ panel visibility
+   *
+   * @param isOpen - Whether the FAQs panel should be open
+   */
   const setFaqsOpen = useCallback((isOpen: boolean) => {
     dispatchUI({ type: "SET_FAQS_OPEN", payload: isOpen });
   }, []);
 
+  /**
+   * Set the font size for chat messages
+   *
+   * @param size - Font size in pixels
+   */
   const setMessageFontSize = useCallback((size: number) => {
     dispatchUI({ type: "SET_FONT_SIZE", payload: size });
   }, []);
 
+  /**
+   * Update the position of the chat window
+   *
+   * @param pos - New position or function to calculate new position
+   */
   const setPosition = useCallback(
     (pos: Position | ((prev: Position) => Position)) => {
       if (typeof pos === "function") {
@@ -243,6 +299,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     [uiState.position]
   );
 
+  /**
+   * Update the size of the chat window
+   *
+   * @param size - New size or function to calculate new size
+   */
   const setSize = useCallback(
     (size: Size | ((prev: Size) => Size)) => {
       if (typeof size === "function") {
@@ -257,7 +318,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     [uiState.size]
   );
 
-  // Error actions
+  /**
+   * Set an error message
+   *
+   * @param message - The error message or null to clear
+   */
   const setError = useCallback((message: string | null) => {
     setErrorState({
       message,
@@ -265,6 +330,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   }, []);
 
+  /**
+   * Dismiss the current error
+   */
   const dismissError = useCallback(() => {
     setErrorState({ message: null, timestamp: null });
   }, []);
@@ -309,6 +377,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
+/**
+ * Custom hook for accessing the chat context
+ *
+ * @returns The chat context object
+ * @throws Error if used outside of a ChatProvider
+ */
 export const useChat = () => {
   const context = useContext(ChatContext);
   if (!context) {
