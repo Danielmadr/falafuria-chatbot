@@ -1,4 +1,15 @@
-// components/SettingsDrawer.tsx
+/**
+ * SettingsDrawer Component
+ *
+ * A slide-out drawer that provides application settings controls including:
+ * - Theme switching (light, dark, system)
+ * - Font size adjustment
+ *
+ * The component uses the useTheme hook from next-themes for theme management
+ * and the useChat context for font size preferences.
+ *
+ * @param className - Optional CSS class to apply to the trigger button
+ */
 import React from "react";
 import { Moon, Sun, Settings, Type } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -30,10 +41,18 @@ const SettingsDrawer: React.FC<SettingsDrawerProps> = ({ className }) => {
   const { setTheme, theme } = useTheme();
   const { setMessageFontSize, messageFontSize } = useChat();
 
+  /**
+   * Updates the application theme when the user selects a different option
+   * @param value - The selected theme value ("light", "dark", or "system")
+   */
   const handleThemeChange = (value: string) => {
     setTheme(value);
   };
-
+  
+  /**
+   * Updates the message font size when the slider is adjusted
+   * @param value - Array containing the single font size value from the slider
+   */
   const handleFontSizeChange = (value: number[]) => {
     setMessageFontSize(value[0]);
   };

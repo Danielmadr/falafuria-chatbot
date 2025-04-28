@@ -1,27 +1,41 @@
 import { useTheme } from "next-themes";
 import { FC, SVGProps, useEffect, useState } from "react";
 
+/**
+ * Props for the AvatarIcon component
+ *
+ * Extends standard SVG element props with theme-aware color options.
+ */
 interface SvgIconProps extends SVGProps<SVGSVGElement> {
+  /** Color to use when the application is in light theme mode (defaults to black) */
   lightColor?: string;
+  /** Color to use when the application is in dark theme mode (defaults to white) */
   darkColor?: string;
 }
 
+/**
+ * AvatarIcon Component
+ *
+ * A theme-aware SVG avatar icon that automatically adjusts its color based on
+ * the current application theme (light or dark mode). This component safely handles
+ * client-side rendering to prevent hydration mismatches with server-side rendering.
+ */
 const AvatarIcon: FC<SvgIconProps> = ({
   lightColor = "#000000",
   darkColor = "#ffffff",
   children,
   ...props
 }) => {
-  // Adicionando estado para controlar a renderização do lado do cliente
+  // State to track client-side mounting status to prevent SSR issues
   const [mounted, setMounted] = useState(false);
   const { theme, resolvedTheme } = useTheme();
 
-  // Efeito para garantir que só renderizaremos a lógica de tema no lado do cliente
+  // Effect to ensure theme-based rendering only happens client-side
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Determina a cor com base no tema atual
+  // Select the appropriate color based on current theme
   const currentColor =
     mounted && (theme === "dark" || resolvedTheme === "dark")
       ? darkColor

@@ -1,4 +1,15 @@
-// components/app-wrapper.tsx
+/**
+ * AppWrapper Component
+ *
+ * Provides the necessary context providers for the application and sets up global error handling.
+ * This component wraps the entire application with:
+ * - WindowSizeProvider - For responsive design and window size tracking
+ * - ChatProvider - For chat state and functionality
+ *
+ * It also sets up global error handling for uncaught exceptions and unhandled promise rejections.
+ *
+ * @param children - The application components to be wrapped
+ */
 "use client";
 
 import React, { useEffect } from "react";
