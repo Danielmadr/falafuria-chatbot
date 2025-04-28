@@ -177,7 +177,7 @@ export const useDrag = ({
     if (!isDragging) return;
 
     // Create throttled version of drag move handler
-    throttledDragMoveRef.current = throttle(handleDragMove, 16); // ~60fps
+    throttledDragMoveRef.current = throttle(handleDragMove as (...args: unknown[]) => unknown, 16); // ~60fps
 
     // Add drag-related classes to body for UI feedback
     document.body.classList.add("dragging");

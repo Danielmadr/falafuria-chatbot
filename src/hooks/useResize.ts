@@ -142,7 +142,7 @@ export const useResize = ({
     if (!isResizing) return;
 
     // Create throttled version of resize move handler (~60fps)
-    throttledResizeMoveRef.current = throttle(handleResizeMove, 16);
+    throttledResizeMoveRef.current = throttle(handleResizeMove as (...args: unknown[]) => unknown, 16);
 
     // Add a class to prevent text selection during resize
     document.body.classList.add("resize-active");

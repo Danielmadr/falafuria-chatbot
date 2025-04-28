@@ -9,6 +9,7 @@
 
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
+import { chatErrorHandler } from "@/utils/errorHandlers";
 
 /**
  * Maximum duration in seconds that the streaming response can take
@@ -44,30 +45,6 @@ export async function POST(req: Request) {
 
   // Return the streaming response with error handling
   return result.toDataStreamResponse({
-    getErrorMessage: errorHandler,
+    getErrorMessage: chatErrorHandler,
   });
-}
-
-/**
- * Error handler function for AI stream responses
- * 
- * Processes different error types and formats them into consistent error messages
- * 
- * @param {unknown} error - The error that occurred during processing
- * @returns {string} A formatted error message
- */
-export function errorHandler(error: unknown) {
-  if (error == null) {
-    return "unknown error";
-  }
-
-  if (typeof error === "string") {
-    return error;
-  }
-
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return JSON.stringify(error);
 }
