@@ -8,17 +8,17 @@
  * Creates a throttled version of a function that limits how often it can be called.
  * This is useful for high-frequency events like scrolling, resizing, or mousemove.
  *
- * @template T - Function type with any number and type of parameters
+ * @template T - Function type
  * @param {T} func - The function to throttle
  * @param {number} limit - The time limit in milliseconds between function calls
  * @returns {(...args: Parameters<T>) => void} Throttled function
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
-  let inThrottle: boolean = false;
-  return function (this: any, ...args: Parameters<T>): void {
+  let inThrottle = false;
+  return function (this: unknown, ...args: Parameters<T>): void {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;
@@ -32,18 +32,18 @@ export function throttle<T extends (...args: any[]) => any>(
  * after a pause in invocations. This is useful for operations that should
  * only happen after a user has finished a rapid succession of events.
  *
- * @template T - Function type with any number and type of parameters
+ * @template T - Function type
  * @param {T} func - The function to debounce
  * @param {number} wait - The delay in milliseconds before executing the function
  * @returns {(...args: Parameters<T>) => void} Debounced function
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout> | null = null;
 
-  return function (this: any, ...args: Parameters<T>): void {
+  return function (this: unknown, ...args: Parameters<T>): void {
     const later = () => {
       timeout = null;
       func.apply(this, args);

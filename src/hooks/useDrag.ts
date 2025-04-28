@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { Position, Size, WindowSize, DragConstraints } from "../types/common";
-import { throttle, isMobileDevice, addEventListeners } from "../utils/common";
+import { isMobileDevice, addEventListeners, throttle } from "../utils/common";
 
 /**
  * Props interface for the useDrag hook
@@ -46,6 +46,9 @@ export const useDrag = ({
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<Position>({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState<boolean>(false);
+  
+  // Ref to store the throttled function
+  const throttledDragMoveRef = useRef<((e: MouseEvent | TouchEvent) => void) | null>(null);
 
   // Check if we're on a mobile device for different event handling
   useEffect(() => {
@@ -161,12 +164,6 @@ export const useDrag = ({
     [isDragging, dragStart, effectiveConstraints, setPosition]
   );
 
-  // Create throttled version of move handler for performance optimization
-  const throttledHandleDragMove = useCallback(
-    throttle(handleDragMove, 16), // ~60fps
-    [handleDragMove]
-  );
-
   /**
    * Handles the end of a drag operation
    * Resets dragging state when mouse/touch is released
@@ -179,6 +176,9 @@ export const useDrag = ({
   useEffect(() => {
     if (!isDragging) return;
 
+    // Create throttled version of drag move handler
+    throttledDragMoveRef.current = throttle(handleDragMove, 16); // ~60fps
+
     // Add drag-related classes to body for UI feedback
     document.body.classList.add("dragging");
 
@@ -189,7 +189,7 @@ export const useDrag = ({
       cleanup = addEventListeners(
         document,
         {
-          touchmove: throttledHandleDragMove as EventListener,
+          touchmove: throttledDragMoveRef.current as EventListener,
           touchend: handleDragEnd,
           touchcancel: handleDragEnd,
         },
@@ -199,7 +199,7 @@ export const useDrag = ({
       // Mouse event listeners for desktop
       document.body.style.cursor = "grabbing";
       cleanup = addEventListeners(document, {
-        mousemove: throttledHandleDragMove as EventListener,
+        mousemove: throttledDragMoveRef.current as EventListener,
         mouseup: handleDragEnd,
         mouseleave: handleDragEnd, // Handle mouse leaving window
       });
@@ -212,8 +212,10 @@ export const useDrag = ({
       if (!isMobile) {
         document.body.style.cursor = "";
       }
+      // Reset throttled function reference
+      throttledDragMoveRef.current = null;
     };
-  }, [isDragging, throttledHandleDragMove, handleDragEnd, isMobile]);
+  }, [isDragging, handleDragMove, handleDragEnd, isMobile]);
 
   return {
     isDragging,

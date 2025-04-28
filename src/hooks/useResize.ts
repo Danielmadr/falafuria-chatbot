@@ -5,9 +5,9 @@
  * while enforcing size constraints.
  */
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Size, ResizeConstraints } from "../types/common";
-import { throttle, addEventListeners } from "../utils/common";
+import { addEventListeners, throttle } from "../utils/common";
 
 /**
  * Represents the initial state when a resize operation begins.
@@ -74,6 +74,9 @@ export const useResize = ({
     width: 0,
     height: 0,
   });
+  
+  // Ref to store the throttled function
+  const throttledResizeMoveRef = useRef<((e: MouseEvent) => void) | null>(null);
 
   /**
    * Initiates a resize operation when the user presses the mouse button.
@@ -127,12 +130,6 @@ export const useResize = ({
     [isResizing, resizeStart, minWidth, minHeight, maxWidth, maxHeight, setSize]
   );
 
-  // Create performance-optimized version of move handler to prevent excessive updates
-  const throttledHandleResizeMove = useCallback(
-    throttle(handleResizeMove, 16), // ~60fps for smooth resizing
-    [handleResizeMove]
-  );
-
   /**
    * Terminates a resize operation when the user releases the mouse button.
    */
@@ -144,12 +141,15 @@ export const useResize = ({
   useEffect(() => {
     if (!isResizing) return;
 
+    // Create throttled version of resize move handler (~60fps)
+    throttledResizeMoveRef.current = throttle(handleResizeMove, 16);
+
     // Add a class to prevent text selection during resize
     document.body.classList.add("resize-active");
 
     // Add global event listeners to track mouse movement
     const removeListeners = addEventListeners(document, {
-      mousemove: throttledHandleResizeMove as EventListener,
+      mousemove: throttledResizeMoveRef.current as EventListener,
       mouseup: handleResizeEnd,
     });
 
@@ -158,8 +158,10 @@ export const useResize = ({
     return () => {
       removeListeners();
       document.body.classList.remove("resize-active");
+      // Reset throttled function reference
+      throttledResizeMoveRef.current = null;
     };
-  }, [isResizing, throttledHandleResizeMove, handleResizeEnd]);
+  }, [isResizing, handleResizeMove, handleResizeEnd]);
 
   return { isResizing, handleResizeStart, handleResizeEnd };
 };
