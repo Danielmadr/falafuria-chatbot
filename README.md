@@ -201,28 +201,3 @@ Este projeto foi desenvolvido como parte de um processo seletivo. Uso e distribu
 <div align="center">
   <p>Desenvolvido com 💙 para o processo seletivo da FURIA</p>
 </div>
-
-## 🔮 Próximos Passos
-
-- [ ] **Autenticação de Usuários** - Perfis personalizados e histórico persistente
-- [ ] **Base de Conhecimento Expandida** - Dados específicos da FURIA via embeddings
-- [ ] **Integração de Mídia Social** - Feed ao vivo de postagens da FURIA
-- [ ] **Interface por Voz** - Interação através de reconhecimento e síntese de fala
-- [ ] **Multilíngue** - Suporte a múltiplos idiomas para alcance global
-- [ ] **App Móvel via PWA** - Experiência nativa em dispositivos móveis
-
-## 📄 Licença
-
-Este projeto foi desenvolvido como parte de um processo seletivo. Uso e distribuição restritos conforme acordado com a FURIA Esports.
-
-## 💙 Agradecimentos
-
-- FURIA Esports pela oportunidade
-- Comunidade de desenvolvedores Next.js/React
-- OpenAI pela tecnologia de processamento de linguagem natural
-
----
-
-<div align="center">
-  <p>Desenvolvido com 💙 para o processo seletivo da FURIA</p>
-</div>
