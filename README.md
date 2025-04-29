@@ -1,100 +1,131 @@
 # FALAFURIA CHATBOT
 
-## 📋 Sobre o Projeto
+<div align="center">
+  <img src="screenshots/logo.png" alt="FALAFURIA Logo"/>
+  <p><em>Assistente virtual interativo especializado no time de CS:GO da FURIA</em></p>
+  
+  [![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+  [![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
+</div>
 
-O Falafuria Chatbot é uma aplicação de chat assistente desenvolvida como parte do processo seletivo para estágio em engenharia de software na FURIA. Este chatbot especializado fornece informações sobre o time de CS:GO da FURIA, construído com Next.js e TypeScript, e integrado com modelos de IA da OpenAI para oferecer respostas contextuais aos fãs e entusiastas.
+## 📋 Visão Geral
 
-## 🚀 Tecnologias Utilizadas
+O FALAFURIA é um assistente virtual inteligente que fornece informações sobre o time de CS:GO da FURIA Esports. Desenvolvido como parte de um processo seletivo, o chatbot oferece uma experiência conversacional fluida com personalidade descontraída, alinhada à identidade da marca.
 
-- **Next.js** - Framework React para desenvolvimento frontend
-- **TypeScript** - Linguagem com tipagem estática para desenvolvimento robusto
-- **Tailwind CSS** - Framework CSS para estilização e design responsivo
-- **Versel AI SDK** - Integração simplificada com modelos de IA (OpenAI GPT)
-- **Shadcn UI** - Biblioteca de componentes acessíveis e personalizáveis
+## ✨ Destaques
 
-## 🛠️ Principais Funcionalidades
+- **Interface de Chat Interativa e Responsiva** - Janela arrastável e redimensionável
+- **Assistente com IA Avançada** - Integração com modelos GPT da OpenAI
+- **Perguntas Frequentes Organizadas** - Acesso rápido por categorias
+- **Design Temático da FURIA** - Identidade visual alinhada com a marca
+- **Modo Claro/Escuro** - Adaptação visual conforme preferência do usuário
+- **Personalização de Interface** - Opções de tamanho de fonte e layout
 
-### 1. Interface de Chat Interativa
-- Janela arrastável e redimensionável para melhor experiência do usuário
-- Design responsivo adaptado a diferentes tamanhos de tela e dispositivos
-- Sistema completo de chat com histórico de mensagens persistente
+## 🛠️ Tecnologias Utilizadas
 
-### 2. Perguntas Frequentes (FAQs)
-- Categorias organizadas para facilitar a navegação
-- Seleção rápida de perguntas comuns sobre o time
-- Integração direta com o sistema de chat para respostas instantâneas
-
-### 3. Assistente Virtual Personalizado
-- Respostas especializadas sobre o time e jogadores da FURIA
-- Comunicação com linguagem descontraída e jovem, alinhada ao público-alvo
-- Integração com o modelo GPT-4.1-nano da OpenAI
-
-### 4. Interface Customizada
-- Tema visual alinhado à identidade visual da FURIA
-- Suporte a modo claro e escuro para diferentes preferências
-- Opções de personalização do tamanho da fonte para acessibilidade
-- Avatares personalizados para usuário e assistente
+| Tecnologia        | Descrição                                       |
+| ----------------- | ----------------------------------------------- |
+| **Next.js**       | Framework React para frontend                   |
+| **TypeScript**    | Linguagem com tipagem estática                  |
+| **Tailwind CSS**  | Utilitários CSS para estilização                |
+| **Vercel AI SDK** | Integração com modelos de IA                    |
+| **OpenAI API**    | Backend para processamento de linguagem natural |
+| **Shadcn/UI**     | Componentes de interface acessíveis             |
 
 ## 📸 Capturas de Tela
 
-![Interface de Chat Dark Mode](/screenshots/homePage_DarkTheme.png)
-![Interface de Chat White Mode](/screenshots/homePage_WhiteTheme.png)
-![Janela de Configurações do Chat](/screenshots/chatConfig.png)
-![Exemplo do Chat em Funcionamento](/screenshots/chatInteraction.png)
-![Exemplo de FAQs](/screenshots/chatFAQs.png)
+<div align="center">
+  <img src="screenshots/homePage_DarkTheme.png" alt="Interface de chat no modo escuro" width="600"/>
+  <p><em>Modo Escuro</em></p>
+  
+  <img src="screenshots/homePage_WhiteTheme.png" alt="Interface de chat no modo claro" width="600"/>
+  <p><em>Modo Claro</em></p>
+</div>
+
+## 🧰 Arquitetura do Projeto
+
+### Estrutura de Diretórios
+
+```
+src/
+├── app/                # App Router e API Routes
+├── components/         # Componentes React reutilizáveis
+├── contexts/           # Gerenciamento de estado global
+├── data/               # Dados estáticos e configurações
+├── hooks/              # Lógica customizada para UI e comportamento
+└── utils/              # Funções utilitárias
+```
+
+### Fluxo de Dados
+
+```mermaid
+graph TD
+    A[Cliente] -->|Envia mensagem| B[API de Chat]
+    B -->|Prompt do sistema + Mensagem| C[OpenAI]
+    C -->|Gera resposta| B
+    B -->|Stream de texto| A
+    D[Contexto do Chat] <-->|Estado persistente| A
+    E[Hooks UI] -->|Drag, Resize, Theme| A
+```
 
 ## 🔧 Instalação e Configuração
 
 ### Pré-requisitos
-- Node.js (versão LTS recomendada)
-- npm, yarn ou pnpm
 
-### Passos para instalação
+- Node.js (versão LTS recomendada: 18+)
+- Gerenciador de pacotes (npm, yarn ou pnpm)
+- Chave de API da OpenAI
+
+### Passos para Instalação
 
 1. **Clone o repositório**
-```bash
-git clone https://github.com/yourusername/furai-chat.git
-cd furai-chat
-```
+
+   ```bash
+   git clone https://github.com/seu-usuario/falafuria-chatbot.git
+   cd falafuria-chatbot
+   ```
 
 2. **Instale as dependências**
-```bash
-npm install
-# ou
-yarn install
-# ou
-pnpm install
-```
 
-3. **Configure as variáveis de ambiente**
+   ```bash
+   npm install
+   # ou
+   yarn install
+   # ou
+   pnpm install
+   ```
 
-Para utilizar o chat com IA, é necessária uma chave da API do OpenAI:
+3. **Configure a API da OpenAI**
 
-**Como obter sua chave:**
-1. Acesse: https://openai.com/
-2. No canto superior direito, clique em "Log in" e em "API Platform"
-3. Faça login e pesquise "API keys" na barra lateral esquerda
-4. Clique em "+ Create new secret key"
-5. Defina um nome, mantenha o projeto default com todas as permissões
-6. Copie o código de acesso gerado
+   Crie um arquivo `.env.local` na raiz do projeto:
 
-Crie um arquivo .env.local no diretório raiz:
-```
-OPENAI_API_KEY=sua_chave_api_aqui
-```
+   ```env
+   OPENAI_API_KEY=sua_chave_api_aqui
+   ```
 
-> **Nota importante:** As requisições via API da OpenAI não são gratuitas para todos os modelos. O projeto utiliza o modelo gpt-4.1-nano (gratuito até a data de publicação deste repositório). Este modelo funciona bem para testes, mas possui limitações: não tem acesso à internet e contém informações atualizadas apenas até outubro de 2023.
+   > **Importante sobre a API da OpenAI:**
+   >
+   > 1. Acesse: https://openai.com/
+   > 2. No canto superior direito, clique em "Log in" e em "API Platform"
+   > 3. Faça login e pesquise "API keys" na barra lateral esquerda
+   > 4. Clique em "+ Create new secret key"
+   > 5. Defina um nome, mantenha o projeto default com todas as permissões
+   > 6. Copie o código de acesso gerado
+   >    **Nota sobre custos:** O projeto usa o modelo gpt-4.1-nano, gratuito até a data de publicação, mas com algumas limitações (sem acesso à internet, dados até outubro/2023).
 
 4. **Inicie o servidor de desenvolvimento**
-```bash
-npm run dev
-# ou
-yarn dev
-# ou
-pnpm dev
-```
 
-5. Acesse [http://localhost:3000](http://localhost:3000) no seu navegador.
+   ```bash
+   npm run dev
+   # ou
+   yarn dev
+   # ou
+   pnpm dev
+   ```
+
+5. Acesse o chat em [http://localhost:3000](http://localhost:3000)
 
 ## 🖱️ Guia de Uso
 
@@ -112,57 +143,86 @@ A interface de chat oferece múltiplas formas de interação:
 - **Enter/Espaço:** Ative botões e controles
 - **Escape:** Feche diálogos ou cancele operações em andamento
 
-## ⚙️ Personalização Técnica
+## 🧩 Personalização e Extensão
 
-### Estilização
-Os componentes utilizam Tailwind CSS. Você pode modificar os estilos diretamente nos componentes ou atualizar a configuração global no arquivo `tailwind.config.js`.
+### Modificar o Estilo Visual
 
-### Tematização
-Para alterar o esquema de cores:
-1. Modifique as variáveis de cores no `tailwind.config.js`
-2. Atualize os tokens de design nos arquivos de tema
+Para alterar cores e estilos:
 
-### Extensão de Funcionalidades
-Para adicionar novos recursos:
-1. Crie componentes adicionais no diretório `components/`
-2. Importe e utilize-os no componente principal `Chat.tsx`
-3. Atualize os provedores de contexto conforme necessário
+1. Edite o arquivo `tailwind.config.js` para modificar o tema global
+2. Use classes Tailwind nos componentes para alterações específicas
 
-## 🔍 Solução de Problemas Comuns
+### Adicionar Novas Categorias de FAQ
 
-| Problema | Solução |
-|----------|---------|
-| A posição da janela é redefinida ao atualizar | Implemente armazenamento persistente com localStorage |
-| O chat não redimensiona corretamente | Verifique a compatibilidade do navegador e as configurações de overflow no CSS |
-| Mensagens não são enviadas | Confirme se a chave da API está configurada corretamente no arquivo .env.local |
-| Texto cortado em dispositivos móveis | Ajuste os valores de padding e margin nas media queries |
+Edite o arquivo `src/data/frequentQuestions.ts`:
 
-## 🧠 Sugestões de Melhorias Futuras
+```typescript
+export const QUESTION_CATEGORIES: QuestionCategory[] = [
+  {
+    title: "Nova Categoria",
+    questions: ["Pergunta 1?", "Pergunta 2?"],
+  },
+  // Categorias existentes...
+];
+```
 
-### 1. Acessibilidade Avançada
-- Navegação por teclado aprimorada com anúncios ARIA
-- Suporte completo a leitores de tela com descrições detalhadas
-- Opções de contraste alto e desativação de animações
+### Modificar o Prompt do Sistema
 
-### 2. Chat por Voz
-- Reconhecimento de fala via Web Speech API
-- Síntese de voz para leitura de respostas
-- Comandos de voz para navegação e ações
+Para alterar a personalidade ou conhecimento do assistente, edite o arquivo `src/app/api/chat/route.ts`:
 
-### 3. Base de Conhecimento Especializada
-- Base de dados vetorial com informações específicas da FURIA
-- Sistema RAG (Retrieval Augmented Generation) para respostas mais precisas
-- Personalização contextual baseada no histórico de interações
+```typescript
+const systemPrompt = {
+  role: "system",
+  content: "Seu novo prompt aqui...",
+};
+```
 
-### 4. Recursos Complementares
-- Sistema de notificações para atualizações do time em tempo real
-- Integração com mídias sociais da FURIA
-- Conteúdo multimídia dinâmico nas respostas (imagens, vídeos, estatísticas)
+## 📈 Roadmap de Melhorias Futuras
 
-## 📝 Considerações Finais
+- [ ] **Autenticação de Usuários** - Perfis personalizados e histórico persistente
+- [ ] **Base de Conhecimento Expandida** - Dados específicos da FURIA via embeddings
+- [ ] **Integração de Mídia Social** - Feed ao vivo de postagens da FURIA
+- [ ] **Interface por Voz** - Interação através de reconhecimento e síntese de fala
+- [ ] **Multilíngue** - Suporte a múltiplos idiomas para alcance global
+- [ ] **App Móvel via PWA** - Experiência nativa em dispositivos móveis
 
-Este projeto demonstra habilidades essenciais de desenvolvimento frontend moderno, integrando React, Next.js e IA conversacional de forma coesa. As melhorias sugeridas visam não apenas aumentar a funcionalidade da aplicação, mas também torná-la mais acessível, intuitiva e personalizada para os fãs da FURIA.
+## 📜 Licença
+
+Este projeto foi desenvolvido como parte de um processo seletivo. Uso e distribuição restritos conforme acordado com a FURIA Esports.
+
+## 🙏 Agradecimentos
+
+- Equipe da FURIA pela oportunidade
+- Comunidade Next.js e React
+- OpenAI pela tecnologia de processamento de linguagem natural
 
 ---
 
-Desenvolvido com 💙 como parte do processo seletivo para estágio em engenharia de software na FURIA.
+<div align="center">
+  <p>Desenvolvido com 💙 para o processo seletivo da FURIA</p>
+</div>
+
+## 🔮 Próximos Passos
+
+- [ ] **Autenticação de Usuários** - Perfis personalizados e histórico persistente
+- [ ] **Base de Conhecimento Expandida** - Dados específicos da FURIA via embeddings
+- [ ] **Integração de Mídia Social** - Feed ao vivo de postagens da FURIA
+- [ ] **Interface por Voz** - Interação através de reconhecimento e síntese de fala
+- [ ] **Multilíngue** - Suporte a múltiplos idiomas para alcance global
+- [ ] **App Móvel via PWA** - Experiência nativa em dispositivos móveis
+
+## 📄 Licença
+
+Este projeto foi desenvolvido como parte de um processo seletivo. Uso e distribuição restritos conforme acordado com a FURIA Esports.
+
+## 💙 Agradecimentos
+
+- FURIA Esports pela oportunidade
+- Comunidade de desenvolvedores Next.js/React
+- OpenAI pela tecnologia de processamento de linguagem natural
+
+---
+
+<div align="center">
+  <p>Desenvolvido com 💙 para o processo seletivo da FURIA</p>
+</div>
