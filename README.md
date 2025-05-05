@@ -10,6 +10,11 @@
   [![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
 </div>
 
+## 🌐 Acesse o Projeto
+
+Você pode ver o projeto rodando ao vivo aqui:  
+🔗 [falafuria-daniels-projects-10b6ebbe.vercel.app](https://falafuria-daniels-projects-10b6ebbe.vercel.app/)
+
 ## 📋 Visão Geral
 
 O FALAFURIA é um assistente virtual inteligente que fornece informações sobre o time de CS:GO da FURIA Esports. Desenvolvido como parte de um processo seletivo, o chatbot oferece uma experiência conversacional fluida com personalidade descontraída, alinhada à identidade da marca.
